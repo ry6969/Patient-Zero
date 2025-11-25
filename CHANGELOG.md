@@ -3,7 +3,7 @@
 ## [v1.0] 2025-11-25
 
 ### Initial Version
--**Model classes**: 
+- **Model classes**: 
 	- Player: Contains the player's basic attributes, setters and getters
 	- Choice: Contains the choices attributes, setters, and getters
 	- StoryNode: Contains the attributes, getters, and List of Choices
