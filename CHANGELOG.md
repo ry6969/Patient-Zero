@@ -1,8 +1,8 @@
-#CHANGELOG
+# CHANGELOG
 
-##[v1.0] 2025-11-25
+## [v1.0] 2025-11-25
 
-###Initial Version
+### Initial Version
 -**Model classes**: 
 	-Player: Contains the player's basic attributes, setters and getters
 	-Choice: Contains the choices attributes, setters, and getters
@@ -13,7 +13,7 @@
 	-GameEngine: Handles the game logic and game loops
 	-StoryData: Contains the hashmap of the story nodes
 	
-###Work in Progress
+### Work in Progress
 -Conditions interface and its implementations
 -Effect interface and its implementations
 -**GameEngine**: Game loop and logic still in progress
