@@ -8,10 +8,10 @@
 	- Choice: Contains the choices attributes, setters, and getters
 	- StoryNode: Contains the attributes, getters, and List of Choices
 - **UI Class**: 
-	-TextRenderer: Contains the static functions for displaying contents
+	- TextRenderer: Contains the static functions for displaying contents
 - **Engine Classes**:
-	-GameEngine: Handles the game logic and game loops
-	-StoryData: Contains the hashmap of the story nodes
+	- GameEngine: Handles the game logic and game loops
+	- StoryData: Contains the hashmap of the story nodes
 	
 ### Work in Progress
 - Conditions interface and its implementations
