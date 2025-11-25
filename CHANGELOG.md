@@ -4,16 +4,16 @@
 
 ### Initial Version
 -**Model classes**: 
-	-Player: Contains the player's basic attributes, setters and getters
-	-Choice: Contains the choices attributes, setters, and getters
-	-StoryNode: Contains the attributes, getters, and List of Choices
--**UI Class**: 
+	- Player: Contains the player's basic attributes, setters and getters
+	- Choice: Contains the choices attributes, setters, and getters
+	- StoryNode: Contains the attributes, getters, and List of Choices
+- **UI Class**: 
 	-TextRenderer: Contains the static functions for displaying contents
--**Engine Classes**:
+- **Engine Classes**:
 	-GameEngine: Handles the game logic and game loops
 	-StoryData: Contains the hashmap of the story nodes
 	
 ### Work in Progress
--Conditions interface and its implementations
--Effect interface and its implementations
--**GameEngine**: Game loop and logic still in progress
+- Conditions interface and its implementations
+- Effect interface and its implementations
+- **GameEngine**: Game loop and logic still in progress
