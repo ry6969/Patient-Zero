@@ -16,5 +16,6 @@
 ### Work in Progress
 - Conditions interface and its implementations
 - Effect interface and its implementations
+- Folder Structure to be organized
 - **GameEngine**: Game loop and logic still in progress
 - **README**: Only posted the template, overview and other description in progress *[Features may still be revised depending on time constraints and project adjustments]*
