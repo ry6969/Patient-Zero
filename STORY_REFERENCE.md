@@ -1,10 +1,13 @@
 # PATIENT ZERO: COMPLETE STORY REFERENCE
 
 ## Overview
-- **Total Nodes**: 64 nodes
+- **Total Actual Nodes**: 61 story nodes (nodes that exist in StoryData.java)
+- **Branching IDs**: 12 ID-only decision points (intercepted by GameEngine, no nodes created)
 - **Acts**: 4 (Journey, Haven, Purge, Finale)
 - **Endings**: 11 different endings
-- **Branching Points**: 10 dynamic outcome nodes
+- **Total Story Points**: 73 (61 nodes + 12 IDs)
+
+**IMPORTANT**: This is YOUR implementation using clean separation of concerns. Story content from Save Point 2, but YOUR system architecture. The 12 branching IDs do NOT have StoryNode objects - they're just IDs that GameEngine intercepts to decide which actual outcome node to display.
 
 ---
 
@@ -64,13 +67,13 @@
 **Effects**: Set zone = "Wasteland"  
 **Choices**:
 1. "Safe route through sewers (1 Energy)" → `SlowTravel` *(Requires 1+ energy)*
-2. "Risk the open route (2 Energy)" → `FastTravel` *(Requires 2+ energy - BRANCHES)*
-3. "Search for supplies (2 Energy)" → `SearchTravel` *(Requires 2+ energy - BRANCHES)*
+2. "Risk the open route (2 Energy)" → `FastTravel` *(Requires 2+ energy - ID-ONLY, GameEngine intercepts)*
+3. "Search for supplies (2 Energy)" → `SearchTravel` *(Requires 2+ energy - ID-ONLY, GameEngine intercepts)*
 4. "I need to rest before continuing" → `RestBeforeJourney` *(Only if energy < 1)*
 
-**BRANCH LOGIC**:
-- `FastTravel` → GameEngine decides: 40% chance `FastTravel_Failure` OR 60% chance `FastTravel_Success`
-- `SearchTravel` → GameEngine decides: 50% chance `SearchTravel_Failure` OR 50% chance `SearchTravel_Success`
+**BRANCHING LOGIC (GameEngine Only)**:
+- **`FastTravel`** (ID-ONLY - NO NODE EXISTS): GameEngine intercepts and decides → 60% chance `FastTravel_Success` OR 40% chance `FastTravel_Failure`
+- **`SearchTravel`** (ID-ONLY - NO NODE EXISTS): GameEngine intercepts and decides → 50% chance `SearchTravel_Success` OR 50% chance `SearchTravel_Failure`
 
 ---
 
@@ -145,24 +148,24 @@
 **What Happens**: Daily life hub in refugee quarters  
 **Effects**: Replenish energy if new day  
 **Choices** (11 total):
-1. "Listen to what people are saying (1 Energy)" → `Mingle` *(Requires energy > 0, suspicion < 6 - BRANCHES)*
-2. "The medical wing... (1 Energy)" → `ObserveClinic` *(Requires energy > 0, suspicion < 6 - BRANCHES)*
-3. "Find something in dorms (1 Energy)" → `SearchDorms` *(Requires energy > 0, suspicion < 6 - BRANCHES)*
-4. "The library (1 Energy)" → `Library` *(Requires knowledge ≥ 5, energy > 0, suspicion < 6 - BRANCHES)*
+1. "Listen to what people are saying (1 Energy)" → `Mingle` *(Requires energy > 0, suspicion < 6 - ID-ONLY, GameEngine intercepts)*
+2. "The medical wing... (1 Energy)" → `ObserveClinic` *(Requires energy > 0, suspicion < 6 - ID-ONLY, GameEngine intercepts)*
+3. "Find something in dorms (1 Energy)" → `SearchDorms` *(Requires energy > 0, suspicion < 6 - ID-ONLY, GameEngine intercepts)*
+4. "The library (1 Energy)" → `Library` *(Requires knowledge ≥ 5, energy > 0, suspicion < 6 - ID-ONLY, GameEngine intercepts)*
 5. "Help in kitchen (1 Energy)" → `WorkKitchen` *(Requires energy > 0, suspicion ≥ 3)*
 6. "Do cleaning duty (1 Energy)" → `CleaningDuty` *(Requires energy > 0, suspicion ≥ 3)*
 7. "Share my rations (1 Energy)" → `ShareFood` *(Requires energy > 0)*
 8. "Rest and watch courtyard (1 Energy)" → `LeisurelyRest` *(Requires energy > 0)*
-9. "Go for main office (2 Energy)" → `RiskInformation` *(Requires energy > 0, suspicion ≥ 6 - BRANCHES)*
+9. "Go for main office (2 Energy)" → `RiskInformation` *(Requires energy > 0, suspicion ≥ 6 - ID-ONLY, GameEngine intercepts)*
 10. "Meet Cris tonight (1 Energy)" → `DormNight` *(Requires met scientist, energy > 0)*
 11. "I need to rest for tomorrow" → `RestInDorm` *(Always available)*
 
-**BRANCH LOGIC**:
-- `Mingle` → GameEngine: If rumors available → `Mingle_Rumor`, else → `Mingle_Nothing`
-- `ObserveClinic` → GameEngine: Random 30%+ (increases with visits) → `ObserveClinic_Caught` OR `ObserveClinic_Learn`
-- `SearchDorms` → GameEngine: Random 50% → `SearchDorms_Caught` OR `SearchDorms_FindNote`
-- `Library` → GameEngine: If knowledge < 7 → `Library_LowKnowledge`, else → `Library_HighKnowledge`
-- `RiskInformation` → GameEngine: Random 50% → `RiskInformation_Success` OR `RiskInformation_Caught`
+**BRANCHING LOGIC (GameEngine Only)**:
+- **`Mingle`** (ID-ONLY - NO NODE EXISTS): GameEngine checks if rumors available → `Mingle_Rumor` OR `Mingle_Nothing`
+- **`ObserveClinic`** (ID-ONLY - NO NODE EXISTS): GameEngine random 30%+ (increases with visits) → `ObserveClinic_Caught` OR `ObserveClinic_Learn`
+- **`SearchDorms`** (ID-ONLY - NO NODE EXISTS): GameEngine random 50% → `SearchDorms_Caught` OR `SearchDorms_FindNote`
+- **`Library`** (ID-ONLY - NO NODE EXISTS): GameEngine checks knowledge < 7 → `Library_LowKnowledge` OR `Library_HighKnowledge`
+- **`RiskInformation`** (ID-ONLY - NO NODE EXISTS): GameEngine random 50% → `RiskInformation_Success` OR `RiskInformation_Caught`
 
 ---
 
@@ -290,10 +293,10 @@
 **What Happens**: Night before meeting Cris in Section-1  
 **Effects**: +1 Day, -1 Morale  
 **Choices**:
-1. "Time to find Section-1." → `Section1Gate`
+1. "Time to find Section-1." → `Section1Gate` *(ID-ONLY, GameEngine intercepts)*
 
-**BRANCH LOGIC**:
-- `Section1Gate` → GameEngine: If knowledge < 3 → `Section1Gate_Fail`, else → `Section1Gate_Success`
+**BRANCHING LOGIC (GameEngine Only)**:
+- **`Section1Gate`** (ID-ONLY - NO NODE EXISTS): GameEngine checks knowledge < 3 → `Section1Gate_Fail` OR `Section1Gate_Success`
 
 ---
 
@@ -343,15 +346,15 @@
 **What Happens**: Investigation hub in research vents (Goal: 12 Knowledge)  
 **Effects**: Set zone = "Hub"  
 **Choices**:
-1. "Steal lab samples (1 Energy)" → `StealSamples` *(Requires energy > 0, suspicion < 10, days remaining > 0 - BRANCHES)*
+1. "Steal lab samples (1 Energy)" → `StealSamples` *(Requires energy > 0, suspicion < 10, days remaining > 0 - ID-ONLY, GameEngine intercepts)*
 2. "Spy on guard conversations (1 Energy)" → `SpyGuards` *(Same requirements)*
 3. "Question friendly scientist (1 Energy)" → `TalkScientist` *(Same requirements)*
-4. "I'm ready to confront the truth" → `FinalCheck` *(Same requirements - BRANCHES)*
+4. "I'm ready to confront the truth" → `FinalCheck` *(Same requirements - ID-ONLY, GameEngine intercepts)*
 5. "I must rest... no energy left" → `RestAction` *(Only if energy ≤ 0)*
 
-**BRANCH LOGIC**:
-- `StealSamples` → GameEngine: Random 50% → `StealSamples_Success` OR `StealSamples_Caught`
-- `FinalCheck` → GameEngine: If knowledge ≥ 12 → `FinalCheck_Ready`, else → `FinalCheck_NotReady`
+**BRANCHING LOGIC (GameEngine Only)**:
+- **`StealSamples`** (ID-ONLY - NO NODE EXISTS): GameEngine random 50% → `StealSamples_Success` OR `StealSamples_Caught`
+- **`FinalCheck`** (ID-ONLY - NO NODE EXISTS): GameEngine checks knowledge ≥ 12 → `FinalCheck_Ready` OR `FinalCheck_NotReady`
 
 ---
 
@@ -415,11 +418,11 @@
 ### Node: `LastChance`
 **What Happens**: Considering desperate final heist  
 **Choices**:
-1. "Yes - it's now or never." → `FinalHeist` *(BRANCHES)*
+1. "Yes - it's now or never." → `FinalHeist` *(ID-ONLY, GameEngine intercepts)*
 2. "No - I need to be more careful." → `ResearchHub`
 
-**BRANCH LOGIC**:
-- `FinalHeist` → GameEngine: If knowledge ≥ 12 after attempt → `FinalHeist_Success`, else random 50% → `FinalHeist_Success` OR `FinalHeist_Failure`
+**BRANCHING LOGIC (GameEngine Only)**:
+- **`FinalHeist`** (ID-ONLY - NO NODE EXISTS): GameEngine applies +2 knowledge first, then checks if total knowledge ≥ 12 → `FinalHeist_Success`, else random 50% → `FinalHeist_Success` OR `FinalHeist_Failure`
 
 ---
 
@@ -427,10 +430,10 @@
 **What Happens**: Final heist succeeded, got remaining evidence  
 **Effects**: -2 Health, +10 Suspicion, +2 Knowledge  
 **Choices**:
-1. "Escape to Cris!" → `EscapeEnd` *(BRANCHES)*
+1. "Escape to Cris!" → `EscapeEnd` *(ID-ONLY, GameEngine intercepts)*
 
-**BRANCH LOGIC**:
-- `EscapeEnd` → GameEngine: If Cris relationship ≥ 8 → `EscapeEnd_Alliance`, else if ≤ 2 → `EscapeEnd_Fugitive`, else → `EscapeEnd_Savior`
+**BRANCHING LOGIC (GameEngine Only)**:
+- **`EscapeEnd`** (ID-ONLY - NO NODE EXISTS): GameEngine checks Cris relationship → If ≥ 8 then `EscapeEnd_Alliance`, else if ≤ 2 then `EscapeEnd_Fugitive`, else `EscapeEnd_Savior`
 
 ---
 
@@ -445,7 +448,7 @@
 ### Node: `CureOptions`
 **What Happens**: Have full evidence, choose what to do with truth  
 **Choices**:
-1. "We escape together and rebuild elsewhere." → `EscapeEnd` *(BRANCHES to Alliance/Fugitive/Savior)*
+1. "We escape together and rebuild elsewhere." → `EscapeEnd` *(ID-ONLY, GameEngine intercepts to Alliance/Fugitive/Savior)*
 2. "We broadcast the truth to the outside world." → `ExposeEnd`
 3. "We take the evidence to the military." → `MilEnd`
 
@@ -568,33 +571,116 @@ These conditions automatically redirect to specific nodes:
 
 ---
 
-## BRANCHING DECISION POINTS (For GameEngine)
+## BRANCHING DECISION POINTS (For GameEngine Implementation)
 
-### When player chooses these node IDs, GameEngine must decide outcome:
+**CRITICAL**: These 12 IDs do NOT have StoryNode objects in StoryData.java. They are ID-ONLY decision points that GameEngine must intercept when processing player choices. When a choice points to one of these IDs, GameEngine decides which actual outcome node to display.
 
-1. **`FastTravel`** → Random: 40% `FastTravel_Failure` OR 60% `FastTravel_Success`
+### All 12 ID-Only Branching Points:
 
-2. **`SearchTravel`** → Random: 50% `SearchTravel_Failure` OR 50% `SearchTravel_Success`
+1. **`FastTravel`** (NO NODE)
+   - **Logic**: Random chance
+   - **Outcomes**: 60% → `FastTravel_Success`, 40% → `FastTravel_Failure`
 
-3. **`Mingle`** → Check: If rumors available → `Mingle_Rumor`, else → `Mingle_Nothing`
+2. **`SearchTravel`** (NO NODE)
+   - **Logic**: Random chance
+   - **Outcomes**: 50% → `SearchTravel_Success`, 50% → `SearchTravel_Failure`
 
-4. **`ObserveClinic`** → Random with increasing chance per visit: `ObserveClinic_Caught` OR `ObserveClinic_Learn`
+3. **`Mingle`** (NO NODE)
+   - **Logic**: Check if player has rumors available
+   - **Outcomes**: If yes → `Mingle_Rumor`, else → `Mingle_Nothing`
 
-5. **`SearchDorms`** → Random: 50% `SearchDorms_Caught` OR 50% `SearchDorms_FindNote`
+4. **`ObserveClinic`** (NO NODE)
+   - **Logic**: Random with increasing catch chance per visit (30% base + 10% per visit)
+   - **Outcomes**: If caught → `ObserveClinic_Caught`, else → `ObserveClinic_Learn`
+   - **Side Effect**: Increment clinic visit counter
 
-6. **`Library`** → Check: If knowledge < 7 → `Library_LowKnowledge`, else → `Library_HighKnowledge`
+5. **`SearchDorms`** (NO NODE)
+   - **Logic**: Random chance
+   - **Outcomes**: 50% → `SearchDorms_Caught`, 50% → `SearchDorms_FindNote`
 
-7. **`RiskInformation`** → Random: 50% `RiskInformation_Success` OR 50% `RiskInformation_Caught`
+6. **`Library`** (NO NODE)
+   - **Logic**: Check player knowledge stat
+   - **Outcomes**: If knowledge < 7 → `Library_LowKnowledge`, else → `Library_HighKnowledge`
 
-8. **`Section1Gate`** → Check: If knowledge < 3 → `Section1Gate_Fail`, else → `Section1Gate_Success`
+7. **`RiskInformation`** (NO NODE)
+   - **Logic**: Random chance
+   - **Outcomes**: 50% → `RiskInformation_Success`, 50% → `RiskInformation_Caught`
 
-9. **`StealSamples`** → Random: 50% `StealSamples_Success` OR 50% `StealSamples_Caught`
+8. **`Section1Gate`** (NO NODE)
+   - **Logic**: Check player knowledge stat
+   - **Outcomes**: If knowledge < 3 → `Section1Gate_Fail`, else → `Section1Gate_Success`
 
-10. **`FinalCheck`** → Check: If knowledge ≥ 12 → `FinalCheck_Ready`, else → `FinalCheck_NotReady`
+9. **`StealSamples`** (NO NODE)
+   - **Logic**: Random chance
+   - **Outcomes**: 50% → `StealSamples_Success`, 50% → `StealSamples_Caught`
 
-11. **`FinalHeist`** → Complex: If knowledge ≥ 12 after +2 → `FinalHeist_Success`, else Random 50% → Success/Failure
+10. **`FinalCheck`** (NO NODE)
+    - **Logic**: Check player knowledge stat
+    - **Outcomes**: If knowledge ≥ 12 → `FinalCheck_Ready`, else → `FinalCheck_NotReady`
 
-12. **`EscapeEnd`** → Check Cris relationship: ≥8 → `Alliance`, ≤2 → `Fugitive`, else → `Savior`
+11. **`FinalHeist`** (NO NODE)
+    - **Logic**: Apply +2 knowledge first, then check if total ≥ 12, else random
+    - **Outcomes**: If knowledge ≥ 12 after +2 → `FinalHeist_Success`, else random 50% → `FinalHeist_Success` OR `FinalHeist_Failure`
+    - **Side Effects**: -2 Health, +10 Suspicion (applied before branching)
+
+12. **`EscapeEnd`** (NO NODE)
+    - **Logic**: Check Cris relationship stat
+    - **Outcomes**: If relationship ≥ 8 → `EscapeEnd_Alliance`, else if ≤ 2 → `EscapeEnd_Fugitive`, else → `EscapeEnd_Savior`
+
+### GameEngine Implementation Pattern:
+
+```java
+public String getNextNodeId(String choiceTargetId, Player player) {
+    switch (choiceTargetId) {
+        case "FastTravel":
+            return Math.random() < 0.6 ? "FastTravel_Success" : "FastTravel_Failure";
+        
+        case "SearchTravel":
+            return Math.random() < 0.5 ? "SearchTravel_Success" : "SearchTravel_Failure";
+        
+        case "Mingle":
+            return player.hasRumorsAvailable() ? "Mingle_Rumor" : "Mingle_Nothing";
+        
+        case "ObserveClinic":
+            player.incrementClinicVisits();
+            double catchChance = 0.3 + (player.getClinicVisits() * 0.1);
+            return Math.random() < catchChance ? "ObserveClinic_Caught" : "ObserveClinic_Learn";
+        
+        case "SearchDorms":
+            return Math.random() < 0.5 ? "SearchDorms_Caught" : "SearchDorms_FindNote";
+        
+        case "Library":
+            return player.getKnowledge() < 7 ? "Library_LowKnowledge" : "Library_HighKnowledge";
+        
+        case "RiskInformation":
+            return Math.random() < 0.5 ? "RiskInformation_Success" : "RiskInformation_Caught";
+        
+        case "Section1Gate":
+            return player.getKnowledge() < 3 ? "Section1Gate_Fail" : "Section1Gate_Success";
+        
+        case "StealSamples":
+            return Math.random() < 0.5 ? "StealSamples_Success" : "StealSamples_Caught";
+        
+        case "FinalCheck":
+            return player.getKnowledge() >= 12 ? "FinalCheck_Ready" : "FinalCheck_NotReady";
+        
+        case "FinalHeist":
+            // Note: Effects already applied before this call
+            return player.getKnowledge() >= 12 
+                ? "FinalHeist_Success" 
+                : (Math.random() < 0.5 ? "FinalHeist_Success" : "FinalHeist_Failure");
+        
+        case "EscapeEnd":
+            if (player.getCrisRelationship() >= 8) return "EscapeEnd_Alliance";
+            if (player.getCrisRelationship() <= 2) return "EscapeEnd_Fugitive";
+            return "EscapeEnd_Savior";
+        
+        default:
+            // Not a branching ID - return as-is to load the actual node
+            return choiceTargetId;
+    }
+}
+```
 
 ---
 
@@ -685,16 +771,20 @@ List of ~7 rumors that get consumed when shown to player
 
 ---
 
-## TOTAL NODE COUNT: 64 Nodes
+## TOTAL NODE COUNT
 
-**By Category:**
-- Journey: 13 nodes
-- Haven: 27 nodes
-- Purge: 10 nodes
-- Finale: 8 nodes
-- Endings: 11 nodes
-- Special: 1 node (DespairEvent)
+**Actual StoryNode Objects in StoryData.java**: 61 nodes
+**ID-Only Branching Points (No Nodes)**: 12 IDs
+**Total Story Points**: 73
+
+**Breakdown by Category:**
+- Journey: 13 actual nodes
+- Haven: 24 actual nodes (+ 5 ID-only: Mingle, ObserveClinic, SearchDorms, Library, RiskInformation)
+- Purge: 8 actual nodes (+ 2 ID-only: StealSamples, FinalCheck)
+- Finale: 5 actual nodes (+ 2 ID-only: FinalHeist, EscapeEnd)
+- Endings: 11 actual nodes
+- Special: 1 actual node (DespairEvent)
+- Journey branching: 2 ID-only (FastTravel, SearchTravel)
+- Act transitions: 1 ID-only (Section1Gate)
 
 **Total Choices**: ~100+ choice connections
-
-**Dynamic Branches**: 12 branching decision points
