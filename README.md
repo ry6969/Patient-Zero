@@ -4,7 +4,7 @@
 <b>CS 2103 </b> <br/>
 Bueno, Basty A. <br/>
 Canalita, Harry D. <br/>
-
+Manalo, Cris Julian V. <br/>
 </p>
 
 ## ‧₊˚ ┊ Overview
