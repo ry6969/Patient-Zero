@@ -17,3 +17,4 @@
 - Conditions interface and its implementations
 - Effect interface and its implementations
 - **GameEngine**: Game loop and logic still in progress
+- **README**: Only posted the template, overview and other description in progress *[Features may still be revised depending on time constraints and project adjustments]*
