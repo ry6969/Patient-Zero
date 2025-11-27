@@ -2,12 +2,12 @@
 
 ## Overview
 - **Total Actual Nodes**: 61 story nodes (nodes that exist in StoryData.java)
-- **Branching IDs**: 12 ID-only decision points (intercepted by GameEngine, no nodes created)
+- **Branching IDs**: 13 ID-only decision points (intercepted by GameEngine, no nodes created)
 - **Acts**: 4 (Journey, Haven, Purge, Finale)
 - **Endings**: 11 different endings
-- **Total Story Points**: 73 (61 nodes + 12 IDs)
+- **Total Story Points**: 74 (61 nodes + 13 IDs)
 
-**IMPORTANT**: This is YOUR implementation using clean separation of concerns. Story content from Save Point 2, but YOUR system architecture. The 12 branching IDs do NOT have StoryNode objects - they're just IDs that GameEngine intercepts to decide which actual outcome node to display.
+**IMPORTANT**: This is YOUR implementation using clean separation of concerns. Story content from Save Point 2, but YOUR system architecture. The 13 branching IDs do NOT have StoryNode objects - they're just IDs that GameEngine intercepts to decide which actual outcome node to display.
 
 ---
 
@@ -567,15 +567,15 @@ These conditions automatically redirect to specific nodes:
 | Morale ≤ 0 | `DespairEvent` | Every turn before choices |
 | Days in Haven ≥ 20 AND purge not active | `HavenPanicEnd` | When entering `HavenIntro` |
 | Purge active AND days remaining ≤ 0 | `PurgeEnd` | Every turn before choices |
-| Energy ≤ 0 | Auto-rest on current node | When no choices available |
+| Energy ≤ 0 | `ForcedRest` (ID-ONLY) | Every turn before choices |
 
 ---
 
 ## BRANCHING DECISION POINTS (For GameEngine Implementation)
 
-**CRITICAL**: These 12 IDs do NOT have StoryNode objects in StoryData.java. They are ID-ONLY decision points that GameEngine must intercept when processing player choices. When a choice points to one of these IDs, GameEngine decides which actual outcome node to display.
+**CRITICAL**: These 13 IDs do NOT have StoryNode objects in StoryData.java. They are ID-ONLY decision points that GameEngine must intercept when processing player choices. When a choice points to one of these IDs, GameEngine decides which actual outcome node to display.
 
-### All 12 ID-Only Branching Points:
+### All 13 ID-Only Branching Points:
 
 1. **`FastTravel`** (NO NODE)
    - **Logic**: Random chance
@@ -627,6 +627,11 @@ These conditions automatically redirect to specific nodes:
     - **Logic**: Check Cris relationship stat
     - **Outcomes**: If relationship ≥ 8 → `EscapeEnd_Alliance`, else if ≤ 2 → `EscapeEnd_Fugitive`, else → `EscapeEnd_Savior`
 
+13. **`ForcedRest`** (NO NODE)
+    - **Logic**: Check player's current zone
+    - **Outcomes**: If zone = "Wasteland" → `RestBeforeJourney`, else if zone = "Haven" → `RestInDorm`, else if zone = "Hub" → `RestAction`
+    - **Trigger**: Automatic global interrupt when Energy ≤ 0
+
 ### GameEngine Implementation Pattern:
 
 ```java
@@ -674,6 +679,18 @@ public String getNextNodeId(String choiceTargetId, Player player) {
             if (player.getCrisRelationship() >= 8) return "EscapeEnd_Alliance";
             if (player.getCrisRelationship() <= 2) return "EscapeEnd_Fugitive";
             return "EscapeEnd_Savior";
+        
+        case "ForcedRest":
+            String zone = player.getZone();
+            if (zone == null || zone.equals("Wasteland")) {
+                return "RestBeforeJourney";
+            } else if (zone.equals("Haven")) {
+                return "RestInDorm";
+            } else if (zone.equals("Hub")) {
+                return "RestAction";
+            } else {
+                return "RestBeforeJourney"; // Fallback
+            }
         
         default:
             // Not a branching ID - return as-is to load the actual node
