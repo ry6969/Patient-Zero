@@ -8,8 +8,8 @@ import java.util.ArrayList;
 
 public class TextRenderer {
 
-    private static final int MAX_WIDTH = 70;
-    private static final int COLUMN_WIDTH = 16;
+    private static final int MAX_WIDTH = 75;
+    private static final int COLUMN_WIDTH = 14;
 
     //Printing the Game Screen
 
@@ -30,20 +30,23 @@ public class TextRenderer {
             "Health: " + player.getHealth(),
             "Energy: " + player.getEnergy(),
             "Knowledge: " + player.getKnowledge(),
-            "Suspicion: " + player.getSuspicion()
+            "Suspicion: " + player.getSuspicion(),
+            "Morale: " + player.getMorale()
         };
 
         System.out.print("|");
         for (String stat : stats) {
             int padding = (COLUMN_WIDTH - stat.length()) / 2;
-            int extra = (COLUMN_WIDTH - stat.length()) % 2; // handle odd spaces
 
-            System.out.print(" ".repeat(padding) + stat + " ".repeat(padding + extra) + "|");
+            System.out.print(" ".repeat(padding) + stat + " ".repeat(padding) + "|");
         }
         System.out.println();
 
         printDoubleBorder();
         System.out.println("DAY: " + player.getDay());
+        if (player.getZone().equals("Haven")) {
+            System.out.println("DAYS IN HAVEN: " + player.getHavenDays());
+        }
         printSingleBorder();
     }
 

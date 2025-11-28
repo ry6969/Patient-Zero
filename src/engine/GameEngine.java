@@ -4,8 +4,6 @@ import model.Player;
 import model.StoryNode;
 import model.Choice;
 import effect.*;
-import exception.InvalidChoiceException;
-import exception.GameStateException;
 import ui.TextRenderer;
 import java.util.Scanner;
 import java.util.List;
@@ -58,14 +56,7 @@ public class GameEngine {
             TextRenderer.printGameScreen(player, currentNode.getStory(), availableChoices);
 
             // 4. Get player input
-            int choiceIndex = 0;
-            try {
-                choiceIndex = getPlayerInput(availableChoices.size()) - 1; // TextRenderer expects 1-indexed, convert to 0-indexed
-            } catch (InvalidChoiceException e) {
-                System.out.println("\n[Error: " + e.getMessage() + "]");
-                gameRunning = false;
-                break;
-            }
+            int choiceIndex = getPlayerInput(availableChoices.size()) - 1; // TextRenderer expects 1-indexed, convert to 0-indexed
 
             // 5. Get the chosen choice
             Choice chosenChoice = availableChoices.get(choiceIndex);
@@ -83,23 +74,14 @@ public class GameEngine {
             currentNode = StoryData.getNode(nextNodeId);
 
             if (currentNode == null) {
-                try {
-                    throw new GameStateException("Node not found: " + nextNodeId);
-                } catch (GameStateException e) {
-                    System.out.println("[FATAL ERROR: " + e.getMessage() + "]");
-                    gameRunning = false;
-                    break;
-                }
+                System.out.println("[ERROR: Node not found: " + nextNodeId + "]");
+                gameRunning = false;
+                break;
             }
 
             // 10. Decrement purge countdown if active
             if (player.isPurgeActive()) {
                 player.setPurgeCountdown(player.getPurgeCountdown() - 1);
-            }
-
-            // 11. Increment haven days if in Haven
-            if (player.getZone().equals("Haven")) {
-                player.setHavenDays(player.getHavenDays() + 1);
             }
         }
 
@@ -124,6 +106,15 @@ public class GameEngine {
             case "ObserveClinic_Caught":
             case "ObserveClinic_Learn":
                 player.setClinicVisits(player.getClinicVisits() + 1);
+                break;
+
+            // Sleep/Rest actions - increment haven days only when sleeping in Haven
+            case "LeisurelyRest":
+            case "RestInDorm":
+            case "ForcedRest":
+                if (player.getZone().equals("Haven")) {
+                    player.setHavenDays(player.getHavenDays() + 1);
+                }
                 break;
 
             // No special effects for other nodes
@@ -161,25 +152,26 @@ public class GameEngine {
             TextRenderer.clearScreen();
             List<Choice> despairChoices = getAvailableChoices(currentNode);
             TextRenderer.printGameScreen(player, currentNode.getStory(), despairChoices);
-            try {
-                int choiceIndex = getPlayerInput(despairChoices.size()) - 1;
-                Choice chosen = despairChoices.get(choiceIndex);
-                applyEffects(currentNode, player);
-                String nextNodeId = getNextNodeId(chosen.getNextNodeId(), player);
-                currentNode = StoryData.getNode(nextNodeId);
-            } catch (InvalidChoiceException e) {
-                System.out.println("\n[Error: " + e.getMessage() + "]");
-            }
+            int choiceIndex = getPlayerInput(despairChoices.size()) - 1;
+            Choice chosen = despairChoices.get(choiceIndex);
+            applyEffects(currentNode, player);
+            String nextNodeId = getNextNodeId(chosen.getNextNodeId(), player);
+            currentNode = StoryData.getNode(nextNodeId);
             return true;
         }
 
-        // Energy ≤ 0 → ForcedRest (branching by zone)
+        // Energy ≤ 0 → ForcedRest
         if (player.getEnergy() <= 0) {
+            currentNode = StoryData.getNode("ForcedRest");
             TextRenderer.clearScreen();
-            System.out.println("[You are completely exhausted. You must rest.]");
-            String nextNodeId = (player.getZone().equals("Haven")) ? "HavenIntro" : "ResearchHub";
+            List<Choice> forcedRestChoices = getAvailableChoices(currentNode);
+            TextRenderer.printGameScreen(player, currentNode.getStory(), forcedRestChoices);
+            int choiceIndex = getPlayerInput(forcedRestChoices.size()) - 1;
+            Choice chosen = forcedRestChoices.get(choiceIndex);
+            applyEffects(currentNode, player);
+            handleSpecialNodeEffects(currentNode.getId(), player);
+            String nextNodeId = getNextNodeId(chosen.getNextNodeId(), player);
             currentNode = StoryData.getNode(nextNodeId);
-            scanner.nextLine(); // Wait for player to continue
             return true;
         }
 
@@ -220,23 +212,20 @@ public class GameEngine {
     /**
      * Get and validate player input
      */
-    private int getPlayerInput(int numChoices) throws InvalidChoiceException {
+    private int getPlayerInput(int numChoices) {
         while (true) {
             try {
                 String input = scanner.nextLine().trim();
                 int choice = Integer.parseInt(input);
 
                 if (choice < 1 || choice > numChoices) {
-                    throw new InvalidChoiceException(
-                        "Choice out of range. Expected 1-" + numChoices + ", got " + choice
-                    );
+                    System.out.print("Choice out of range. Expected 1-" + numChoices + ", got " + choice + ". Please try again: ");
+                    continue;
                 }
 
                 return choice; // Return as 1-indexed (TextRenderer handles this)
             } catch (NumberFormatException e) {
-                throw new InvalidChoiceException("Invalid input format. Expected integer.", e);
-            } catch (InvalidChoiceException e) {
-                System.out.print(e.getMessage() + "\nPlease enter a number between 1 and " + numChoices + ": ");
+                System.out.print("Invalid input. Please enter a number between 1 and " + numChoices + ": ");
             }
         }
     }

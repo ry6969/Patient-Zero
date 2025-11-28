@@ -173,9 +173,7 @@ public class StoryData {
 
         StoryNode havenIntro = new StoryNode("HavenIntro",
             "You are in the refugees' quarters, a converted gymnasium filled with cots.\n" +
-            "People keep to themselves, avoiding eye contact. Something's not right here.\n\n" +
-            "Days in Haven: (Track this - panic at 20 days)\n" +
-            "Energy remaining: (Track this - auto-rest at 0)");
+            "People keep to themselves, avoiding eye contact. Something's not right here.");
         havenIntro.addChoice(new Choice("\"I should listen to what people are saying.\"", "Maybe I can learn something useful... (-1 Energy)", "Mingle"));
         havenIntro.addChoice(new Choice("\"The medical wing seems important...\"", "What are they really doing in there? (-1 Energy)", "ObserveClinic"));
         havenIntro.addChoice(new Choice("\"Maybe I can find something useful in the dorms.\"", "People must leave clues behind... (-1 Energy)", "SearchDorms"));
@@ -350,6 +348,15 @@ public class StoryData {
             "\"You made it,\" he whispers, relief evident.");
         section1.addChoice(new Choice("\"What's really happening here?\"", null, "PurgeReveal"));
         storyNodes.put(section1.getId(), section1);
+
+        StoryNode forcedRest = new StoryNode("ForcedRest",
+            "Your body finally gives out. You collapse, unable to take another step.\n\n" +
+            "As consciousness fades, you find yourself in a bunk, recovering.\n\n" +
+            "(Energy fully restored, +1 day)");
+        forcedRest.addEffect(new DayEffect(1));
+        forcedRest.addEffect(new EnergyEffect(5));
+        forcedRest.addChoice(new Choice("(Continue)", null, "HavenIntro"));
+        storyNodes.put(forcedRest.getId(), forcedRest);
 
         StoryNode restInDorm = new StoryNode("RestInDorm",
             "You collapse onto your cot, surrounded by the sounds of sleeping refugees.\n\n" +
