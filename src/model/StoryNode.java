@@ -2,11 +2,13 @@ package model;
 
 import java.util.List;
 import java.util.ArrayList;
+import effect.Effect;
 
 public class StoryNode {
     private String id;
     private String story;
     private List<Choice> choices = new ArrayList<>();
+    private List<Effect> effects = new ArrayList<>();
 
     public StoryNode(String id, String story){
         this.id = id;
@@ -21,10 +23,16 @@ public class StoryNode {
         return choices;
     }
 
+    public void addEffect(Effect e){
+        effects.add(e);
+    }
+
+    public List<Effect> getEffects(){
+        return effects;
+    }
+
     public String getId() {return id;}
     public String getStory() {return story;}
-
-    
 }
 
 

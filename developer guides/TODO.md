@@ -20,8 +20,7 @@ Based on our OOP discussion and project requirements:
 - [ ] `clinicVisits` (int) - Tracks visits to clinic (increases catch chance)
 - [ ] `metScientist` (boolean) - Unlocks DormNight choice
 - [ ] `crisRelationship` (int, 0 to 8) - **CRITICAL for endings**
-- [ ] `inventory` (ArrayList<String>) - Items like "Data Chip"
-- [ ] `rumors` (ArrayList<String>) - List of available rumors for Mingle
+- [ ] `heardRumorIndices` (Array[int]) - **IMPORTANT: Tracks which of the 7 rumors the player has heard** (indices 0-6)
 
 **Optional (for flavor):**
 - [ ] `metScavenger` (boolean)
@@ -29,7 +28,16 @@ Based on our OOP discussion and project requirements:
 
 **Also Add:**
 - [ ] Getter/setter methods for all new fields
-- [ ] Helper methods: `hasItem(String)`, `addToInventory(String)`, `hasRumorsAvailable()`, `removeRumor()`
+- [ ] Helper methods: 
+  - **`hasUnheardRumors()`** → returns true if `heardRumorIndices.size() < 7`
+  - **`getUnheardIndices()`** → returns Set<Integer> of indices not yet heard (used by GameEngine for random selection)
+  - **`markRumorHeard(int index)`** → adds index to heardRumorIndices
+  - `changeMorale(int delta)`, `changeHealth/Energy/Knowledge/Suspicion(int delta)`
+
+**RUMOR ARCHITECTURE (Critical Design):**
+- Rumor **TEXT** is stored in `StoryData.RUMORS[]` (7 static strings)
+- Rumor **STATE** is tracked in Player's `heardRumorIndices` Set
+- GameEngine picks random unheard index → fetches text from StoryData.RUMORS → marks as heard in Player
 
 ---
 
@@ -165,11 +173,11 @@ while (gameRunning) {
 
 ## **PHASE 5: SPECIAL SYSTEMS** 🎲
 
-### **5.1: Rumor System**
-- [ ] Initialize 7 rumors in Player constructor
-- [ ] Implement `hasRumorsAvailable()` → returns `!rumors.isEmpty()`
-- [ ] Implement `removeRumor()` → removes one random rumor
-- [ ] Use in Mingle branching
+### **5.1: Rumor System** ✅ ARCHITECTURE COMPLETE
+- [x] Added static `RUMORS[]` array to StoryData.java (7 rumor strings)
+- [x] Player tracks `heardRumorIndices` Set<Integer> (indices only, not text)
+- [x] Helper methods in Player: `hasUnheardRumors()`, `getUnheardIndices()`, `markRumorHeard(int)`
+- [ ] **Remaining**: Wire into GameEngine Mingle branching (Phase 4.4)
 
 ### **5.2: Zone Management**
 - [ ] Set zone to "Wasteland" at game start
@@ -183,11 +191,6 @@ while (gameRunning) {
 - [ ] Activate at `PurgeReveal`: `purgeActive = true`, `purgeCountdown = 7`
 - [ ] Decrement countdown only when `purgeActive == true`
 - [ ] Check countdown ≤ 0 in global interrupts
-
-### **5.4: Inventory System**
-- [ ] Implement `addToInventory(String item)`
-- [ ] Implement `hasItem(String item)`
-- [ ] Optional: Check for "Data Chip" when meeting Cris
 
 ---
 
@@ -257,7 +260,7 @@ while (gameRunning) {
 - [ ] **Polymorphism** - `effect.apply(player)`, `condition.isMet(player)` ✅
 - [ ] **Abstraction** - Interfaces (Effect, Condition) ✅
 - [ ] **Exception Handling** - InvalidChoiceException in try-catch ✅
-- [ ] **Arrays** - ArrayList for inventory, rumors, effects, conditions ✅
+- [ ] **Arrays** - ArrayList for effects, conditions ✅
 - [ ] **Console I/O** - Scanner for input, TextRenderer for output ✅
 
 ---

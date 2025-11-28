@@ -2,10 +2,23 @@ package engine;
 
 import model.StoryNode;
 import model.Choice;
+import effect.*;
+import condition.*;
 
 import java.util.HashMap;
 
 public class StoryData {
+    // ================= RUMOR SYSTEM =================
+    public static final String[] RUMORS = {
+        "A woman whispers that her husband went to the medical wing and never came back.",
+        "Two janitors argue about the 'incinerator schedule' increasing.",
+        "You hear of a 'Director's List'—names of people about to be purged.",
+        "An old man claims the clinic's 'treatments' make people more compliant.",
+        "You overhear guards joking about 'tonight's collection' from Sector B.",
+        "A child's drawing shows people being led away by figures in hazmat suits.",
+        "Graffiti in the bathroom: 'THEY LIE' with an arrow pointing toward the vents."
+    };
+
     // Hashmap to store all story nodes
     private static HashMap<String, StoryNode> storyNodes = new HashMap<>();
 
@@ -27,6 +40,7 @@ public class StoryData {
             "You meet his gaze. 'I've seen what the Haven is doing. The disappearances. This isn't just an outbreak.'\n\n" +
             "He studies you for a long moment, then nods slowly. 'You're not like the others. Name's Jax. Used to be a Haven guard.'\n" +
             "He presses a data chip into your hand. 'Find Cris. He's the only one who can stop this madness.'");
+        scavengerConvince.addEffect(new MoraleEffect(2));
         scavengerConvince.addChoice(new Choice("\"Thank you. I won't waste this.\"", null, "JourneyChoices"));
         storyNodes.put(scavengerConvince.getId(), scavengerConvince);
 
@@ -42,6 +56,7 @@ public class StoryData {
             "Jax smiles grimly. 'Stubbornness I can work with.'\n\n" +
             "'Find Cris in the Haven. Show him this chip. Tell him Jax sent you.'\n" +
             "He presses the data chip into your hand and vanishes into the shadows.");
+        scavengerTrust.addEffect(new MoraleEffect(1));
         scavengerTrust.addChoice(new Choice("\"Time to find this Cris.\"", null, "JourneyChoices"));
         storyNodes.put(scavengerTrust.getId(), scavengerTrust);
 
@@ -49,6 +64,7 @@ public class StoryData {
             "Jax sighs. 'Honesty. Refreshing, but disappointing.'\n\n" +
             "'I'll give you this much—find Cris in the Haven. If you change your mind, tell him Jax sent you.'\n" +
             "He tosses the chip into the rubble near you and disappears.");
+        scavengerDoubt.addEffect(new MoraleEffect(-1));
         scavengerDoubt.addChoice(new Choice("\"Better take the chip and move on.\"", null, "JourneyChoices"));
         storyNodes.put(scavengerDoubt.getId(), scavengerDoubt);
 
@@ -58,15 +74,18 @@ public class StoryData {
             "He mutters to himself: '...if they don't make it to Cris in time...'\n\n" +
             "After a moment, he seems to make a decision and tosses something into the rubble near you " +
             "before melting back into the shadows.");
+        observeScavenger.addEffect(new EnergyEffect(-1));
+        observeScavenger.addEffect(new KnowledgeEffect(1));
+        observeScavenger.addEffect(new MoraleEffect(-1));
         observeScavenger.addChoice(new Choice("\"Take the chip and continue.\"", null, "JourneyChoices"));
         storyNodes.put(observeScavenger.getId(), observeScavenger);
 
         StoryNode journeyChoices = new StoryNode("JourneyChoices",
             "You stand at the edge of the dead city, looking toward where Haven supposedly lies. " +
             "The journey won't be easy. Each path costs energy—choose wisely.");
-        journeyChoices.addChoice(new Choice("\"I'll take the safe route through the sewers.\" (1 Energy)", "Slow but steady", "SlowTravel"));
-        journeyChoices.addChoice(new Choice("\"I'll risk the open route for speed.\" (2 Energy)", "Fast but dangerous", "FastTravel"));
-        journeyChoices.addChoice(new Choice("\"Let me search for supplies first.\" (2 Energy)", "Risk vs reward", "SearchTravel"));
+        journeyChoices.addChoice(new Choice("\"I'll take the safe route through the sewers.\"", "Slow but steady (-1 Energy)", "SlowTravel"));
+        journeyChoices.addChoice(new Choice("\"I'll risk the open route for speed.\"", "Fast but dangerous (-2 Energy)", "FastTravel"));
+        journeyChoices.addChoice(new Choice("\"Let me search for supplies first.\"", "Risk vs reward (-2 Energy)", "SearchTravel"));
         journeyChoices.addChoice(new Choice("\"I need to rest before continuing.\"", "No energy left", "RestBeforeJourney"));
         storyNodes.put(journeyChoices.getId(), journeyChoices);
 
@@ -74,6 +93,9 @@ public class StoryData {
             "You find a relatively secure alcove in the ruins. As you rest, you think about Jax's words. " +
             "What kind of place is the Haven really? And who is Cris?\n\n" +
             "The rest does you good. (Energy restored)");
+        restBeforeJourney.addEffect(new DayEffect(1));
+        restBeforeJourney.addEffect(new MoraleEffect(1));
+        restBeforeJourney.addEffect(new EnergyEffect(5));
         restBeforeJourney.addChoice(new Choice("\"Continue toward Haven.\"", null, "JourneyChoices"));
         storyNodes.put(restBeforeJourney.getId(), restBeforeJourney);
 
@@ -81,6 +103,9 @@ public class StoryData {
             "You move through sewers and back alleys to avoid the infected. " +
             "The air is thick with the smell of decay, but you remain unseen and unhurt. " +
             "Three long days pass in tense silence.");
+        slowTravel.addEffect(new EnergyEffect(-1));
+        slowTravel.addEffect(new DayEffect(3));
+        slowTravel.addEffect(new MoraleEffect(-1));
         slowTravel.addChoice(new Choice("\"Finally... the Haven.\"", null, "Arrival"));
         storyNodes.put(slowTravel.getId(), slowTravel);
 
@@ -88,6 +113,9 @@ public class StoryData {
             "You sprint across the open highway, exposed to the elements and whatever else might be watching. " +
             "Your heart pounds with every shadow that moves.\n\n" +
             "\"Made it!\" You move fast and stay low, feeling a surge of confidence.");
+        fastTravelSuccess.addEffect(new EnergyEffect(-2));
+        fastTravelSuccess.addEffect(new DayEffect(1));
+        fastTravelSuccess.addEffect(new MoraleEffect(1));
         fastTravelSuccess.addChoice(new Choice("\"The Haven gates... almost there.\"", null, "Arrival"));
         storyNodes.put(fastTravelSuccess.getId(), fastTravelSuccess);
 
@@ -95,12 +123,19 @@ public class StoryData {
             "You sprint across the open highway, exposed to the elements and whatever else might be watching.\n\n" +
             "\"Damn it!\" You scramble over a razor-wire fence to avoid a patrol. The wire slices your arm deep.\n" +
             "Blood soaks through your makeshift bandage.");
+        fastTravelFailure.addEffect(new EnergyEffect(-2));
+        fastTravelFailure.addEffect(new DayEffect(1));
+        fastTravelFailure.addEffect(new HealthEffect(-3));
+        fastTravelFailure.addEffect(new MoraleEffect(-2));
         fastTravelFailure.addChoice(new Choice("\"The Haven gates... almost there.\"", null, "Arrival"));
         storyNodes.put(fastTravelFailure.getId(), fastTravelFailure);
 
         StoryNode searchTravelSuccess = new StoryNode("SearchTravel_Success",
             "You scour a collapsed pharmacy, the shelves mostly empty but maybe something useful remains...\n\n" +
             "\"Jackpot!\" You find a pristine Medkit tucked behind the counter. This could save your life.");
+        searchTravelSuccess.addEffect(new EnergyEffect(-2));
+        searchTravelSuccess.addEffect(new HealthEffect(5));
+        searchTravelSuccess.addEffect(new MoraleEffect(1));
         searchTravelSuccess.addChoice(new Choice("\"Back to the main path.\"", null, "JourneyChoices"));
         storyNodes.put(searchTravelSuccess.getId(), searchTravelSuccess);
 
@@ -108,6 +143,9 @@ public class StoryData {
             "You scour a collapsed pharmacy, the shelves mostly empty but maybe something useful remains...\n\n" +
             "\"Watch out!\" A desperate looter attacks you with a knife! You fend him off, but not before taking a hit.\n" +
             "Your ribs ache where the blade grazed you.");
+        searchTravelFailure.addEffect(new EnergyEffect(-2));
+        searchTravelFailure.addEffect(new HealthEffect(-2));
+        searchTravelFailure.addEffect(new MoraleEffect(-1));
         searchTravelFailure.addChoice(new Choice("\"Back to the main path.\"", null, "JourneyChoices"));
         storyNodes.put(searchTravelFailure.getId(), searchTravelFailure);
 
@@ -116,6 +154,7 @@ public class StoryData {
             "Guards patrol the perimeter with cold efficiency. Civilians walk in tired lines.\n\n" +
             "Through the crowd, you spot a scientist with armed escorts, could that be Cris?\n" +
             "You try to reach him, but the crowd surges and he's gone. Still, you've made it inside.");
+        arrival.addEffect(new MoraleEffect(2));
         arrival.addChoice(new Choice("\"Find a bunk and settle in.\"", "If you have energy", "HavenIntro"));
         arrival.addChoice(new Choice("\"I can't... keep going...\" (Collapse)", "If no energy left", "ArrivalCollapse"));
         storyNodes.put(arrival.getId(), arrival);
@@ -123,6 +162,10 @@ public class StoryData {
         StoryNode arrivalCollapse = new StoryNode("ArrivalCollapse",
             "You wake up in a sterile white room. A tag on your wrist reads: SUBJECT-88.\n" +
             "The air smells of antiseptic and something else... fear?");
+        arrivalCollapse.addEffect(new SuspicionEffect(3));
+        arrivalCollapse.addEffect(new MoraleEffect(-2));
+        arrivalCollapse.addEffect(new EnergyEffect(3));
+        arrivalCollapse.addEffect(new DayEffect(2));
         arrivalCollapse.addChoice(new Choice("\"I need to find the dorms...\"", null, "HavenIntro"));
         storyNodes.put(arrivalCollapse.getId(), arrivalCollapse);
 
@@ -133,16 +176,25 @@ public class StoryData {
             "People keep to themselves, avoiding eye contact. Something's not right here.\n\n" +
             "Days in Haven: (Track this - panic at 20 days)\n" +
             "Energy remaining: (Track this - auto-rest at 0)");
-        havenIntro.addChoice(new Choice("\"I should listen to what people are saying.\" (1 Energy)", "Maybe I can learn something useful...", "Mingle"));
-        havenIntro.addChoice(new Choice("\"The medical wing seems important...\" (1 Energy)", "What are they really doing in there?", "ObserveClinic"));
-        havenIntro.addChoice(new Choice("\"Maybe I can find something useful in the dorms.\" (1 Energy)", "People must leave clues behind...", "SearchDorms"));
-        havenIntro.addChoice(new Choice("\"The library might have answers.\" (1 Energy)", "I need to understand the science behind this (Needs 5+ Knowledge)", "Library"));
-        havenIntro.addChoice(new Choice("\"Help in the kitchen.\" (1 Energy)", "Blend in with workers", "WorkKitchen"));
-        havenIntro.addChoice(new Choice("\"Do cleaning duty.\" (1 Energy)", "Appear harmless", "CleaningDuty"));
-        havenIntro.addChoice(new Choice("\"I should share my rations with that family.\" (1 Energy)", "They look like they need it more than me", "ShareFood"));
-        havenIntro.addChoice(new Choice("\"I'll just rest and watch the courtyard.\" (1 Energy)", "Maybe I'm overthinking this...", "LeisurelyRest"));
-        havenIntro.addChoice(new Choice("\"I'm going for the main office. No more playing safe.\" (2 Energy)", "Time for desperate measures (High suspicion only)", "RiskInformation"));
-        havenIntro.addChoice(new Choice("\"Tonight's the night. Time to meet Cris.\" (1 Energy)", "This could be my only chance (After meeting scientist)", "DormNight"));
+        havenIntro.addChoice(new Choice("\"I should listen to what people are saying.\"", "Maybe I can learn something useful... (-1 Energy)", "Mingle"));
+        havenIntro.addChoice(new Choice("\"The medical wing seems important...\"", "What are they really doing in there? (-1 Energy)", "ObserveClinic"));
+        havenIntro.addChoice(new Choice("\"Maybe I can find something useful in the dorms.\"", "People must leave clues behind... (-1 Energy)", "SearchDorms"));
+        Choice libraryChoice = new Choice("\"The library might have answers.\"", "I need to understand the science behind this (Needs 5+ Knowledge, -1 Energy)", "Library");
+        libraryChoice.addCondition(new KnowledgeCondition(5));
+        havenIntro.addChoice(libraryChoice);
+        
+        havenIntro.addChoice(new Choice("\"Help in the kitchen.\"", "Blend in with workers (-1 Energy)", "WorkKitchen"));
+        havenIntro.addChoice(new Choice("\"Do cleaning duty.\"", "Appear harmless (-1 Energy)", "CleaningDuty"));
+        havenIntro.addChoice(new Choice("\"I should share my rations with that family.\"", "They look like they need it more than me (-1 Energy)", "ShareFood"));
+        havenIntro.addChoice(new Choice("\"I'll just rest and watch the courtyard.\"", "Maybe I'm overthinking this... (-1 Energy)", "LeisurelyRest"));
+        
+        Choice riskChoice = new Choice("\"I'm going for the main office. No more playing safe.\"", "Time for desperate measures (High suspicion only, -2 Energy)", "RiskInformation");
+        riskChoice.addCondition(new SuspicionCondition(6));
+        havenIntro.addChoice(riskChoice);
+        
+        Choice dormNightChoice = new Choice("\"Tonight's the night. Time to meet Cris.\"", "This could be my only chance (After meeting scientist, -1 Energy)", "DormNight");
+        dormNightChoice.addCondition(new FlagCondition("metScientist", true));
+        havenIntro.addChoice(dormNightChoice);
         havenIntro.addChoice(new Choice("\"I need to rest for tomorrow.\"", "Tomorrow will be another day", "RestInDorm"));
         storyNodes.put(havenIntro.getId(), havenIntro);
 
@@ -150,12 +202,16 @@ public class StoryData {
             "You listen to the refugees' whispered conversations.\n\n" +
             "An old woman leans close: \"My husband went to the medical wing and never came back. They said he was 'processed.'\"\n\n" +
             "\"Interesting,\" you whisper to yourself. The pieces are coming together.");
+        mingleRumor.addEffect(new EnergyEffect(-1));
+        mingleRumor.addEffect(new KnowledgeEffect(1));
+        mingleRumor.addEffect(new MoraleEffect(-1));
         mingleRumor.addChoice(new Choice("\"Back to the dorms.\"", null, "HavenIntro"));
         storyNodes.put(mingleRumor.getId(), mingleRumor);
 
         StoryNode mingleNothing = new StoryNode("Mingle_Nothing",
             "You listen to the refugees' whispered conversations.\n\n" +
             "\"Nothing useful today,\" you mutter. People are keeping to themselves, too afraid to talk.");
+        mingleNothing.addEffect(new EnergyEffect(-1));
         mingleNothing.addChoice(new Choice("\"Back to the dorms.\"", null, "HavenIntro"));
         storyNodes.put(mingleNothing.getId(), mingleNothing);
 
@@ -163,6 +219,9 @@ public class StoryData {
             "You watch the medical wing from a distance, trying to look casual.\n\n" +
             "\"Move along, subject,\" a guard snarls, catching you loitering. His hand rests on his weapon.\n" +
             "\"Just curious,\" you say quickly, backing away. He's watching you now.");
+        observeClinicCaught.addEffect(new EnergyEffect(-1));
+        observeClinicCaught.addEffect(new SuspicionEffect(1));
+        observeClinicCaught.addEffect(new MoraleEffect(-1));
         observeClinicCaught.addChoice(new Choice("\"Better get back.\"", null, "HavenIntro"));
         storyNodes.put(observeClinicCaught.getId(), observeClinicCaught);
 
@@ -170,6 +229,8 @@ public class StoryData {
             "You watch the medical wing from a distance, staying in the shadows.\n\n" +
             "\"What are they hiding?\" you wonder, watching a large van leave the bay. The side is marked \"Non-viable Samples.\"\n" +
             "Your blood runs cold. What does that mean?");
+        observeClinicLearn.addEffect(new EnergyEffect(-1));
+        observeClinicLearn.addEffect(new KnowledgeEffect(1));
         observeClinicLearn.addChoice(new Choice("\"Better get back.\"", null, "HavenIntro"));
         storyNodes.put(observeClinicLearn.getId(), observeClinicLearn);
 
@@ -178,6 +239,9 @@ public class StoryData {
             "\"Looking for something?\" a guard asks suspiciously, appearing from nowhere.\n" +
             "\"Just... checking if this bed is taken,\" you stammer. He narrows his eyes but says nothing.\n" +
             "You feel his gaze follow you as you leave.");
+        searchDormsCaught.addEffect(new EnergyEffect(-1));
+        searchDormsCaught.addEffect(new SuspicionEffect(3));
+        searchDormsCaught.addEffect(new MoraleEffect(-2));
         searchDormsCaught.addChoice(new Choice("\"Back to safety.\"", null, "HavenIntro"));
         storyNodes.put(searchDormsCaught.getId(), searchDormsCaught);
 
@@ -185,30 +249,43 @@ public class StoryData {
             "You search through the sleeping areas looking for clues.\n\n" +
             "\"This could be important,\" you whisper, finding a crumpled note under a mattress.\n" +
             "Written in shaky handwriting: \"4-1-B\". A code? An ID? You pocket it quickly.");
+        searchDormsFind.addEffect(new EnergyEffect(-1));
+        searchDormsFind.addEffect(new KnowledgeEffect(1));
         searchDormsFind.addChoice(new Choice("\"Back to safety.\"", null, "HavenIntro"));
         storyNodes.put(searchDormsFind.getId(), searchDormsFind);
 
         StoryNode workKitchen = new StoryNode("WorkKitchen",
             "\"Good worker,\" a guard grunts as you scrub pots. \"Stay out of trouble.\"\n\n" +
             "\"Just trying to help,\" you reply, accepting extra rations from the cook. (Suspicion -1, Health +1)");
+        workKitchen.addEffect(new EnergyEffect(-1));
+        workKitchen.addEffect(new SuspicionEffect(-1));
+        workKitchen.addEffect(new HealthEffect(1));
+        workKitchen.addEffect(new MoraleEffect(1));
         workKitchen.addChoice(new Choice("\"Back to the dorms.\"", null, "HavenIntro"));
         storyNodes.put(workKitchen.getId(), workKitchen);
 
         StoryNode cleaningDuty = new StoryNode("CleaningDuty",
             "You mop the endless corridors, making sure to look busy but harmless.\n\n" +
             "\"At least I'm blending in,\" you think, noticing the guards pay you no mind. (Suspicion -1)");
+        cleaningDuty.addEffect(new EnergyEffect(-1));
+        cleaningDuty.addEffect(new SuspicionEffect(-1));
+        cleaningDuty.addEffect(new MoraleEffect(1));
         cleaningDuty.addChoice(new Choice("\"Time to head back.\"", null, "HavenIntro"));
         storyNodes.put(cleaningDuty.getId(), cleaningDuty);
 
         StoryNode leisurelyRest = new StoryNode("LeisurelyRest",
             "You find a quiet spot and watch people. For a moment, you can almost pretend this is normal life.\n\n" +
             "\"Maybe I'm being paranoid,\" you think, then remember Jax's warning.");
+        leisurelyRest.addEffect(new EnergyEffect(-1));
+        leisurelyRest.addEffect(new MoraleEffect(2));
         leisurelyRest.addChoice(new Choice("\"Back to reality.\"", null, "HavenIntro"));
         storyNodes.put(leisurelyRest.getId(), leisurelyRest);
 
         StoryNode shareFood = new StoryNode("ShareFood",
             "\"Thank you,\" the mother whispers, her children devouring the extra rations.\n\n" +
             "\"We're all in this together,\" you reply, feeling a glimmer of hope.");
+        shareFood.addEffect(new EnergyEffect(-1));
+        shareFood.addEffect(new MoraleEffect(2));
         shareFood.addChoice(new Choice("\"Back to the dorms.\"", null, "HavenIntro"));
         storyNodes.put(shareFood.getId(), shareFood);
 
@@ -278,6 +355,9 @@ public class StoryData {
             "You collapse onto your cot, surrounded by the sounds of sleeping refugees.\n\n" +
             "\"Just a few hours of peace,\" you think before drifting off.\n\n" +
             "(A new day begins - Energy fully restored, +1 day, Haven day counter +1)");
+        restInDorm.addEffect(new DayEffect(1));
+        restInDorm.addEffect(new MoraleEffect(1));
+        restInDorm.addEffect(new EnergyEffect(5));
         restInDorm.addChoice(new Choice("(Auto-continues to next day)", null, "HavenIntro"));
         storyNodes.put(restInDorm.getId(), restInDorm);
 
@@ -297,9 +377,9 @@ public class StoryData {
             "PURGE COUNTDOWN: (Track days remaining)\n" +
             "Current Knowledge: (Show current/12)\n" +
             "Energy remaining: (Show current/max)");
-        researchHub.addChoice(new Choice("\"I'll steal lab samples.\" (1 Energy)", "High risk, but necessary (Random: +3 Knowledge OR -3 Health +3 Suspicion)", "StealSamples"));
-        researchHub.addChoice(new Choice("\"I'll spy on guard conversations.\" (1 Energy)", "Learn what I can safely (+1 Knowledge)", "SpyGuards"));
-        researchHub.addChoice(new Choice("\"I'll question a friendly scientist.\" (1 Energy)", "Find allies in the system (+2 Knowledge +2 Suspicion)", "TalkScientist"));
+        researchHub.addChoice(new Choice("\"I'll steal lab samples.\"", "High risk, but necessary (Random: +3 Knowledge OR -3 Health +3 Suspicion, -1 Energy)", "StealSamples"));
+        researchHub.addChoice(new Choice("\"I'll spy on guard conversations.\"", "Learn what I can safely (+1 Knowledge, -1 Energy)", "SpyGuards"));
+        researchHub.addChoice(new Choice("\"I'll question a friendly scientist.\"", "Find allies in the system (+2 Knowledge +2 Suspicion, -1 Energy)", "TalkScientist"));
         researchHub.addChoice(new Choice("\"I'm ready to confront the truth.\"", "No turning back now", "FinalCheck"));
         researchHub.addChoice(new Choice("\"I must rest... no energy left.\"", "Completely exhausted", "RestAction"));
         storyNodes.put(researchHub.getId(), researchHub);
