@@ -11,8 +11,8 @@ import java.util.ArrayList;
 import java.util.Random;
 
 /**
- * GameEngine - Core game loop and logic
- * Handles: interrupts, effect application, branching decisions, input validation
+ -GameEngine - Core game loop and logic
+ - Handles: interrupts, effect application, branching decisions, input validation
  */
 public class GameEngine {
     private Player player;
@@ -36,6 +36,9 @@ public class GameEngine {
         player.setZone("Wasteland");
         currentNode = StoryData.getNode("Start");
 
+        TextRenderer.printWelcomeScreen(); 
+        scanner.nextLine();
+
         while (gameRunning) {
             // 1. Check global interrupts first
             if (checkInterrupts()) {
@@ -44,12 +47,6 @@ public class GameEngine {
 
             // 2. Get and filter available choices by conditions
             List<Choice> availableChoices = getAvailableChoices(currentNode);
-
-            if (availableChoices.isEmpty()) {
-                System.out.println("\n[No choices available. Game over.]");
-                gameRunning = false;
-                break;
-            }
 
             // 3. Display game screen using TextRenderer
             TextRenderer.clearScreen();
@@ -88,9 +85,7 @@ public class GameEngine {
         scanner.close();
     }
 
-    /**
-     * Handle special node effects like zone changes, flag setting, and tracking
-     */
+    //Handle special node effects like zone changes, flag setting, and tracking
     private void handleSpecialNodeEffects(String nodeId, Player player) {
         switch (nodeId) {
             // Zone changes
@@ -209,9 +204,8 @@ public class GameEngine {
         return available;
     }
 
-    /**
-     * Get and validate player input
-     */
+
+    //Get and validate player input
     private int getPlayerInput(int numChoices) {
         while (true) {
             try {
@@ -230,22 +224,16 @@ public class GameEngine {
         }
     }
 
-    /**
-     * Display current node text and stats
-     */
-    /**
-     * Apply all effects from a node to the player (polymorphism!)
-     */
+    
+    //Apply all effects from a node to the player (polymorphism!)
     private void applyEffects(StoryNode node, Player player) {
         for (Effect effect : node.getEffects()) {
             effect.apply(player);
         }
     }
 
-    /**
-     * Get the actual next node ID (handles branching)
-     * Some choices lead to branching decisions with multiple outcomes
-     */
+    //Get the actual next node ID (handles branching)
+    //Some choices lead to branching decisions with multiple outcomes
     private String getNextNodeId(String choiceNodeId, Player player) {
         switch (choiceNodeId) {
             // ===== JOURNEY PHASE BRANCHING =====
@@ -305,9 +293,7 @@ public class GameEngine {
         }
     }
 
-    /**
-     * MINGLE branching: Pick random unheard rumor or nothing
-     */
+    //MINGLE branching: Pick random unheard rumor or nothing
     private String branchMingle() {
         if (player.hasUnheardRumors()) {
             // Get random unheard rumor index

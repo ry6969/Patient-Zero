@@ -5,11 +5,10 @@ import model.Player;
 /**
  * Effect that changes player suspicion.
  */
-public class SuspicionEffect implements Effect {
-    private int amount;
+public class SuspicionEffect extends Effect {
 
     public SuspicionEffect(int amount) {
-        this.amount = amount;
+        super(amount);
     }
 
     @Override
@@ -17,8 +16,4 @@ public class SuspicionEffect implements Effect {
         player.changeSuspicion(amount);
     }
 
-    @Override
-    public String getDescription() {
-        return (amount >= 0 ? "+" : "") + amount + " Suspicion";
-    }
 }

@@ -1,8 +1,21 @@
-# CHANGELOG# CHANGELOG# CHANGELOG
+# CHANGELOG
 
 
+## [v2.1] - 2025-11-29 (Minor Fixes and Welcome Display Function Optimization)
 
-## [v2.0] - 2025-11-28 (FINAL - Simplified Professor Version)
+### CHANGES
+
+#### Effects.java
+*Due to project criteria, the developers have decided to change Effect and its implementations using "interfaces" into abstract classes instead*
+- Effect.java is now an abstract class.
+- The remaining Effect implementations are now subclasses that has the Inherited "int amount" and the Overriden "apply()".
+
+#### TextRenderer.java
+- Now contains the printIcon() and printWelcomeScreen() as helper functions for printing a basic Welcome Screen.
+- The printWelcomeScreen() is being called at the start of the game in the GameEngine before the start of the game loop.
+
+
+## [v2.] - 2025-11-28 (FINAL Version)
 
 
 
@@ -14,13 +27,12 @@
 
 
 
-All 9 development phases completed successfully. Final version simplified by removing test files and custom exceptions for cleaner professor submission.### MAJOR RELEASE: COMPLETE GAME ENGINE### CHANGES
+All 9 development phases completed successfully.
+### MAJOR RELEASE: COMPLETE GAME ENGINE
 
-
+### CHANGES
 
 ### ✨ ALL FEATURES COMPLETED- **StoryNode**: 
-
-
 
 #### Phase 1 - Player Model ✅#### ✨ Features Completed	- Ported the story from "save point 2"
 

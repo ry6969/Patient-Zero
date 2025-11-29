@@ -2,14 +2,11 @@ package effect;
 
 import model.Player;
 
-/**
- * Effect that changes player morale.
- */
-public class MoraleEffect implements Effect {
-    private int amount;
+//Effect that changes the player's morale
+public class MoraleEffect extends Effect {
 
     public MoraleEffect(int amount) {
-        this.amount = amount;
+        super(amount);
     }
 
     @Override
@@ -17,8 +14,4 @@ public class MoraleEffect implements Effect {
         player.changeMorale(amount);
     }
 
-    @Override
-    public String getDescription() {
-        return (amount >= 0 ? "+" : "") + amount + " Morale";
-    }
 }

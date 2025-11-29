@@ -21,7 +21,6 @@ public class Player {
     // Rumor Tracking (7 rumors total, indexed 0-6)
     private boolean[] heardRumors;
     
-    // Optional relationship tracking
     private boolean metScavenger;
     private int jaxRelationship;
 
@@ -33,8 +32,8 @@ public class Player {
         this.suspicion = suspicion;
         this.day = day;
         
-        // Initialize additional fields with defaults
-        this.morale = 5; // Starting morale at neutral
+        // Initialize with defaults
+        this.morale = 5; 
         this.zone = "Wasteland"; // Starting zone
         this.havenDays = 0;
         this.purgeCountdown = 0;
@@ -49,9 +48,7 @@ public class Player {
         this.jaxRelationship = 0;
     }
 
-    // ============================================
     // CORE STAT GETTERS
-    // ============================================
     
     public int getHealth() {
         return health;
@@ -73,9 +70,7 @@ public class Player {
         return day;
     }
 
-    // ============================================
     // ADDITIONAL STAT GETTERS
-    // ============================================
     
     public int getMorale() {
         return morale;
@@ -117,9 +112,7 @@ public class Player {
         return jaxRelationship;
     }
 
-    // ============================================
     // CORE STAT SETTERS
-    // ============================================
     
     public void setHealth(int health) {
         this.health = health;
@@ -141,9 +134,7 @@ public class Player {
         this.day = day;
     }
 
-    // ============================================
     // ADDITIONAL STAT SETTERS
-    // ============================================
     
     public void setMorale(int morale) {
         this.morale = morale;
@@ -185,16 +176,14 @@ public class Player {
         this.jaxRelationship = jaxRelationship;
     }
 
-    // ============================================
-    // CHANGE/DELTA UTILITY METHODS
-    // ============================================
+    // CHANGE UTILITY METHODS
     
-    public void changeHealth(int delta) {
-        this.health += delta;
+    public void changeHealth(int num) {
+        this.health += num;
     }
 
-    public void changeEnergy(int delta) {
-        this.energy += delta;
+    public void changeEnergy(int num) {
+        this.energy += num;
         // Cap energy at 5
         if (this.energy > 5) {
             this.energy = 5;
@@ -205,24 +194,24 @@ public class Player {
         }
     }
 
-    public void changeKnowledge(int delta) {
-        this.knowledge += delta;
+    public void changeKnowledge(int num) {
+        this.knowledge += num;
     }
 
-    public void changeSuspicion(int delta) {
-        this.suspicion += delta;
+    public void changeSuspicion(int num) {
+        this.suspicion += num;
     }
 
-    public void changeMorale(int delta) {
-        this.morale += delta;
+    public void changeMorale(int num) {
+        this.morale += num;
     }
 
-    public void advanceDay(int delta) {
-        this.day += delta;
+    public void advanceDay(int num) {
+        this.day += num;
     }
 
-    public void advanceHavenDays(int delta) {
-        this.havenDays += delta;
+    public void advanceHavenDays(int num) {
+        this.havenDays += num;
     }
 
     public void decrementPurgeCountdown() {
@@ -235,23 +224,20 @@ public class Player {
         this.clinicVisits++;
     }
 
-    public void changeCrisRelationship(int delta) {
-        this.crisRelationship += delta;
+    public void changeCrisRelationship(int num) {
+        this.crisRelationship += num;
     }
 
-    public void changeJaxRelationship(int delta) {
-        this.jaxRelationship += delta;
+    public void changeJaxRelationship(int num) {
+        this.jaxRelationship += num;
     }
 
-    // ============================================
     // RUMOR SYSTEM METHODS
-    // ============================================
     
     /**
-     * Checks if the player has unheard rumors available.
-     * Total rumors in the system = 7 (indexed 0-6)
-     * @return true if any rumor is still unheard (false in heardRumors array)
-     */
+     - Checks if the player has unheard rumors available.
+     - returns true if any rumor is still unheard (false in heardRumors array)
+    */
     public boolean hasUnheardRumors() {
         for (int i = 0; i < 7; i++) {
             if (!heardRumors[i]) {
@@ -262,9 +248,9 @@ public class Player {
     }
 
     /**
-     * Gets an array of unheard rumor indices.
-     * Used by GameEngine to randomly select from available rumors.
-     * @return int[] of indices not yet heard (0-6), or empty array if all heard
+     - Gets an array of unheard rumor indices.
+     - Used by GameEngine to randomly select from available rumors.
+     - returns int array of indices not yet heard (0-6), or empty array if all heard
      */
     public int[] getUnheardIndices() {
         int count = 0;
@@ -284,29 +270,22 @@ public class Player {
         return unheard;
     }
 
-    /**
-     * Marks a rumor as heard by setting its index to true.
-     * @param index the rumor index (0-6) to mark as heard
-     */
+    //Marks a rumor as heard by setting its index to true.
+
     public void markRumorHeard(int index) {
         if (index >= 0 && index < 7) {
             heardRumors[index] = true;
         }
     }
 
-    /**
-     * Gets the boolean array of rumors already heard.
-     * @return boolean[] where true = heard, false = not heard
-     */
+
+    //Gets the boolean array of rumors already heard.
     public boolean[] getHeardRumors() {
         return heardRumors;
     }
 
-    /**
-     * Checks if a specific rumor has been heard.
-     * @param index the rumor index (0-6)
-     * @return true if the rumor has been heard
-     */
+    
+    //Checks if a specific rumor has been heard (Basically checks the value inside heardRumors[])
     public boolean hasHeardRumor(int index) {
         if (index >= 0 && index < 7) {
             return heardRumors[index];

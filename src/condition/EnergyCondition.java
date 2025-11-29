@@ -2,9 +2,8 @@ package condition;
 
 import model.Player;
 
-/**
- * Condition that requires the player to have a minimum amount of energy.
- */
+
+//Condition that requires the player to have a minimum amount of energy.
 public class EnergyCondition implements Condition {
     private int requiredEnergy;
 
@@ -17,8 +16,4 @@ public class EnergyCondition implements Condition {
         return player.getEnergy() >= requiredEnergy;
     }
 
-    @Override
-    public String getRequirementText() {
-        return "Requires " + requiredEnergy + "+ Energy";
-    }
 }

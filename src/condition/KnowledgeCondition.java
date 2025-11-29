@@ -2,9 +2,9 @@ package condition;
 
 import model.Player;
 
-/**
- * Condition that requires the player to have a minimum amount of knowledge.
- */
+
+//Condition that requires the player to have a minimum amount of knowledge.
+
 public class KnowledgeCondition implements Condition {
     private int requiredKnowledge;
 
@@ -17,8 +17,4 @@ public class KnowledgeCondition implements Condition {
         return player.getKnowledge() >= requiredKnowledge;
     }
 
-    @Override
-    public String getRequirementText() {
-        return "Requires " + requiredKnowledge + "+ Knowledge";
-    }
 }

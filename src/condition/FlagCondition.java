@@ -2,10 +2,9 @@ package condition;
 
 import model.Player;
 
-/**
- * Condition that checks if the player has met the scientist (metScientist flag).
- * Used to gate choices like DormNight that require prior story progression.
- */
+ //Condition that checks if the player has met the scientist (metScientist flag).
+//Used on choices like DormNight that require prior story progression.
+
 public class FlagCondition implements Condition {
     private String flagName;
     private boolean requiredValue;
@@ -30,9 +29,4 @@ public class FlagCondition implements Condition {
         return false;
     }
 
-    @Override
-    public String getRequirementText() {
-        String value = requiredValue ? "must have" : "must not have";
-        return value + " '" + flagName + "'";
-    }
 }

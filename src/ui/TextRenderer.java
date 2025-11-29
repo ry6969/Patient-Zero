@@ -11,6 +11,32 @@ public class TextRenderer {
     private static final int MAX_WIDTH = 75;
     private static final int COLUMN_WIDTH = 14;
 
+    //Printing the Welcome Screen
+    public static void printWelcomeScreen() {
+        printDoubleBorder();
+        System.out.println();
+        System.out.println();
+        printIcon();
+        
+        // Add 2 newlines after the icon
+        System.out.println();
+        System.out.println();
+        
+        // Print "PATIENT ZERO" centered
+        String patientZero = "PATIENT ZERO";
+        int padding = (MAX_WIDTH - patientZero.length()) / 2;
+        System.out.println(" ".repeat(padding) + patientZero);
+        
+        // Print "Press Enter" centered
+        String pressEnter = "Press Enter";
+        padding = (MAX_WIDTH - pressEnter.length()) / 2;
+        System.out.println(" ".repeat(padding) + pressEnter);
+
+        System.out.println();
+        System.out.println();
+        printDoubleBorder();
+    }
+
     //Printing the Game Screen
 
     public static void printGameScreen(Player player, String story, List<Choice> choices){
@@ -73,6 +99,33 @@ public class TextRenderer {
         System.out.print("Enter Action Number: ");
     }
 
+private static void printIcon() {
+    String[] iconLines = {
+        "               @@@@@@@@@@               ",
+        "             @@@@@@@@@@@@@@             ",
+        "           : + + @@@@@@ *:: .           ",
+        "          @       @@@@       @          ",
+        "                  @@@@                  ",
+        "          #      @*@@#@      *          ",
+        "           @  : @@@@@@@@.:  @           ",
+        "           @@@@@@@@@*@@@@@@@@           ",
+        "         .  @@@@%      %@@@@  .         ",
+        "    -@@@-@  @@@@ @:-.+- :@@@  @:@@@-    ",
+        "  @@@@@@@-@%@@@: @-@@*@ :@@@%@-@@@@@@@  ",
+        "   =@@@@@@*@@@@@  @@%@  @@@@@*@@@@@@=   ",
+        "   @@@@@@@@-@  @@+.   +@@  @=@@@@@@@@   ",
+        "   +@@@@@@@@@*  #@@@@@@#  *@@@@@@@@@+   ",
+        "     =@@@@@@                @@@@@@=     ",
+        "      -@-                      -@-      "
+    };
+    
+    for (String line : iconLines) {
+        // Center each line of the icon
+        int padding = (MAX_WIDTH - line.length()) / 2;
+        System.out.println(" ".repeat(padding) + line);
+    }
+}
+
     //Public Methods
 
     public static void printDoubleBorder(){
@@ -84,7 +137,6 @@ public class TextRenderer {
     }
 
     // Word Wrapping
-    
     private static List<String> wrap (String text, int width){
         List<String> result = new ArrayList<>();
         String[] words = text.split(" ");
