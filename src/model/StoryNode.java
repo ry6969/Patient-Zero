@@ -15,6 +15,10 @@ public class StoryNode {
         this.story = story;
     }
 
+    public void setStory(String newStory) { // for mingle_rumor
+        this.story = newStory;
+    }
+
     public void addChoice(Choice c){
         choices.add(c);
     }

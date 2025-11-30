@@ -1,5 +1,73 @@
 # CHANGELOG
 
+## [v2.2] - 2025-12-01 (Critical Bug Fixes)
+
+### 🐛 BUG FIXES
+
+#### Effect System - Variable Shadowing Bug
+**Problem**: Several Effect subclasses were declaring duplicate `private int amount;` fields, shadowing the parent's `protected int amount` field. This caused the local `amount` to remain at 0 (default value) while the parent's `amount` was correctly initialized, resulting in effects applying 0 change instead of the intended values.
+
+**Files Fixed**:
+- **DayEffect.java**: Removed duplicate `private int amount;` declaration
+  - Impact: Day counter now properly increments
+- **KnowledgeEffect.java**: Removed duplicate `private int amount;` declaration
+  - Impact: Knowledge stat now properly increases/decreases
+- **HealthEffect.java**: Removed duplicate `private int amount;` declaration
+  - Impact: Health stat now properly increases/decreases
+
+**Result**: All stats (Days, Knowledge, Health) now update correctly when effects are applied.
+
+#### TextRenderer.java - Purge Counter Display
+- **Purge Counter**: Added a purge counter display on the stats bars under the day counter
+
+#### GameEngine.java - Initial State Improvements
+- **Day Counter**: Changed initial player day from 0 to 1 (game now starts on "Day 1")
+- **Haven Days**: Added `player.setHavenDays(1);` in "Arrival" case to start Haven days at 1 instead of 0
+
+#### Rumor System - Enhanced Mechanics
+- **Knowledge Cap**: Added maximum knowledge limit of 4 from rumors to prevent infinite knowledge farming
+- **Probability**: Changed from 100% rumor chance to 70% chance (30% nothing), adding variability
+- **Display**: Rumors now dynamically update the StoryNode text instead of using separate System.out.println
+  - Requires new `setStory()` method in StoryNode.java
+
+#### Choice System - Inverted Conditions (Enhancement)
+**New Feature**: Added ability to show choices only when conditions are NOT met.
+
+**Changes to Choice.java**:
+- Added `private boolean inverted = false;` field
+- Added `setInverted(boolean inverted)` method
+- Added `isInverted()` getter method
+- Updated `isAvailable()` logic to support condition inversion
+
+**Use Case**: Can now show "Rest" choice only when energy is low/zero by using:
+```java
+restChoice.addCondition(new EnergyCondition(1));
+restChoice.setInverted(true); // Shows only when energy < 1
+```
+
+#### StoryNode.java
+- Added `setStory(String newStory)` method to support dynamic story text updates (used by enhanced rumor system)
+
+### 📝 Technical Details
+
+**Root Cause Analysis**:
+The variable shadowing bug occurred because:
+1. Parent `Effect` class declares `protected int amount`
+2. Child classes incorrectly redeclared `private int amount`
+3. Constructor called `super(amount)`, setting parent's field correctly
+4. But `apply()` method referenced the local shadowed field (always 0)
+5. Result: All effects using the shadowed variable applied 0 change
+
+**Solution**: Removed duplicate field declarations, allowing child classes to properly inherit and use the parent's `amount` field.
+
+### 🎯 Impact
+
+- **Critical**: Game stats now work as intended - players can progress through the game
+- **Quality of Life**: Starting at Day 1 instead of Day 0 feels more natural
+- **Balance**: Rumor knowledge cap prevents exploitation
+- **Flexibility**: Inverted conditions enable more sophisticated choice gating
+
+---
 
 ## [v2.1] - 2025-11-29 (Minor Fixes and Welcome Display Function Optimization)
 
@@ -14,404 +82,173 @@
 - Now contains the printIcon() and printWelcomeScreen() as helper functions for printing a basic Welcome Screen.
 - The printWelcomeScreen() is being called at the start of the game in the GameEngine before the start of the game loop.
 
+---
 
-## [v2.] - 2025-11-28 (FINAL Version)
+## [v2.0] - 2025-11-28 (FINAL Version)
 
-
-
-**STATUS**: ✅ PRODUCTION READY & SUBMITTED ## [v2.0] - 2025-11-28 ## [v1.1] - 2025-11-26
-
-
+**STATUS**: ✅ PRODUCTION READY & SUBMITTED
 
 ### 🎉 MAJOR RELEASE: COMPLETE GAME ENGINE
 
-
-
 All 9 development phases completed successfully.
-### MAJOR RELEASE: COMPLETE GAME ENGINE
 
-### CHANGES
+### ✨ ALL FEATURES COMPLETED
 
-### ✨ ALL FEATURES COMPLETED- **StoryNode**: 
-
-#### Phase 1 - Player Model ✅#### ✨ Features Completed	- Ported the story from "save point 2"
-
+#### Phase 1 - Player Model ✅
 - 19 fields tracking complete game state
-
-- Validated getters/setters for all stats	- Separated dynamic text into static nodes for better maintainability
-
+- Validated getters/setters for all stats
 - Energy capping enforced (0-5 max)
-
-- Rumor tracking with boolean[7] array**Phase 1 - Player Model**	  (allows game logic to remain in GameEngine while story data stays clean)
-
+- Rumor tracking with boolean[7] array
 - Comprehensive helper methods (changeEnergy, changeMorale, etc.)
-
-- Haven days tracking (increments only on sleep/rest)- Implemented Player class with 19 fields tracking game state
-
+- Haven days tracking (increments only on sleep/rest)
 - Relationship tracking for Cris character
+- Purge system tracking
 
-- Purge system tracking- Added validated getters/setters for all stats- **Folder Structure**:
-
-
-
-#### Phase 2 - Effect System ✅- Energy capping enforced (0-5 max)```
-
+#### Phase 2 - Effect System ✅
 - Effect interface with 6 implementations:
-
-  - HealthEffect: Modify player health- Rumor tracking with boolean array indexingPatient Zero/
-
+  - HealthEffect: Modify player health
   - EnergyEffect: Modify energy with cap enforcement (0-5)
-
-  - KnowledgeEffect: Modify knowledge stat- Comprehensive helper methods (changeEnergy, changeMorale, etc.)├── CHANGELOG.md
-
+  - KnowledgeEffect: Modify knowledge stat
   - SuspicionEffect: Modify suspicion stat
-
-  - MoraleEffect: Modify morale stat├── README.md
-
+  - MoraleEffect: Modify morale stat
   - DayEffect: Increment day counter
-
-- ~20+ story nodes wired with effects**Phase 2 - Effect System** ├── STORY_REFERENCE.md
-
+- ~20+ story nodes wired with effects
 - Polymorphic effect application in GameEngine
 
-- Created Effect interface with 6 implementations:└── src/
-
 #### Phase 3 - Condition System ✅
-
-- Condition interface with 4 implementations:  - HealthEffect: Modify player health    ├── Main.java
-
+- Condition interface with 4 implementations:
   - EnergyCondition: Requires minimum energy
-
-  - KnowledgeCondition: Requires minimum knowledge  - EnergyEffect: Modify energy with cap enforcement    ├── condition/     (empty, ready for future use)
-
+  - KnowledgeCondition: Requires minimum knowledge
   - SuspicionCondition: Suspicion < threshold
-
-  - FlagCondition: Checks player flags (metScientist, etc.)  - KnowledgeEffect: Modify knowledge stat    ├── effect/        (empty, ready for future use)
-
+  - FlagCondition: Checks player flags (metScientist, etc.)
 - Choice filtering based on conditions
+- 5+ key choices gated by conditions
 
-- 5+ key choices gated by conditions  - SuspicionEffect: Modify suspicion stat    ├── engine/
-
-
-
-#### Phase 4 - Game Engine ✅  - MoraleEffect: Modify morale stat    │   ├── GameEngine.java
-
+#### Phase 4 - Game Engine ✅
 - Complete 11-step game loop:
-
-  1. Check global interrupts (6 types)  - DayEffect: Increment day counter    │   └── StoryData.java
-
+  1. Check global interrupts (6 types)
   2. Get available choices (filtered by conditions)
-
-  3. Display using TextRenderer- ~20+ story nodes wired with effects    ├── model/
-
+  3. Display using TextRenderer
   4. Get player input (validated)
-
-  5. Apply chosen choice effects (polymorphic)- Polymorphic effect application in GameEngine    │   ├── Choice.java
-
+  5. Apply chosen choice effects (polymorphic)
   6. Handle special node effects (zones, flags, tracking)
-
-  7. Determine next node ID (branching logic)    │   ├── Player.java
-
+  7. Determine next node ID (branching logic)
   8. Load next node
-
-  9. Validate node exists**Phase 3 - Condition System**    │   └── StoryNode.java
-
+  9. Validate node exists
   10. Update time-based stats
-
-  11. Loop or end- Created Condition interface with 4 implementations:    └── ui/
-
+  11. Loop or end
 - 6 Global Interrupts:
-
-  - Health ≤ 0 → BadEnd  - EnergyCondition: Requires minimum energy        └── TextRenderer.java
-
+  - Health ≤ 0 → BadEnd
   - Suspicion ≥ 10 → ArrestedEnd
-
-  - Morale ≤ 0 → DespairEvent  - KnowledgeCondition: Requires minimum knowledge```
-
+  - Morale ≤ 0 → DespairEvent
   - Energy ≤ 0 → ForcedRest
-
-  - Haven Days ≥ 20 → HavenPanicEnd  - SuspicionCondition: Suspicion < threshold	
-
+  - Haven Days ≥ 20 → HavenPanicEnd
   - Purge Countdown ≤ 0 → PurgeEnd
-
-- 13 Branching Decision Points with random/deterministic outcomes  - FlagCondition: Checks player flags (metScientist, metScavenger, purgeActive)### Work in Progress
-
+- 13 Branching Decision Points with random/deterministic outcomes
 - Input validation
 
-- Choice filtering based on conditions- Conditions interface and its implementations
-
 #### Phase 5 - Special Systems ✅
-
-- Zone Management (Wasteland → Haven → Hub)- 3 key choices gated: Library (5+ knowledge), RiskInformation (6+ suspicion), DormNight (metScientist)- Effect interface and its implementations
-
+- Zone Management (Wasteland → Haven → Hub)
 - Purge System (7-day countdown activation)
-
-- Haven Days Tracking (increments only on sleep/rest actions)- **GameEngine**: Game loop and logic still in progress
-
+- Haven Days Tracking (increments only on sleep/rest actions)
 - Clinic Visit Tracking (affects probability scaling)
-
-- Rumor System (7 rumors, player knowledge tracking)**Phase 4 - Game Engine**- **README**: Only posted the template, overview and other description in progress *[Features may still be revised depending on time constraints and project adjustments]*
-
+- Rumor System (7 rumors, player knowledge tracking)
 - Relationship System (Cris affects EscapeEnd variant)
 
-- Complete game loop with 11 steps:
-
 #### Phase 6 - Simplified Error Handling ✅
-
-**Design Decision**: Removed custom exceptions for simplified professor version  1. Check global interrupts### Note to Devs
-
+**Design Decision**: Removed custom exceptions for simplified professor version
 - Deleted `InvalidChoiceException.java`
-
-- Deleted `GameStateException.java`  2. Get available choices (filtered by conditions)- *To mimic the dynamic text from "save point 2" while separating different areas of concern, I have turned all dynamic text into static text nodes in StoryNode. The mechanism for triggering dynamic node output can be applied in the GameEngine or a separate class or subclass of the aforementioned class.*
-
+- Deleted `GameStateException.java`
 - Replaced with simple if/else error handling
+- Built-in exceptions (NumberFormatException) still used
+- User-friendly error messages
+- **Benefit**: Cleaner codebase for educational purposes
 
-- Built-in exceptions (NumberFormatException) still used  3. Display using TextRenderer
-
-- User-friendly error messages  4. Get player input
-
-- **Benefit**: Cleaner codebase for educational purposes  5. Apply chosen choice effects
-
-  6. Handle special node effects (zone changes, tracking)
-
-#### Phase 7 - Main Entry Point ✅  7. Determine next node ID (branching logic)
-
-- Welcome screen with ASCII art  8. Move to next node
-
-- Game initialization and startup  9. Decrement purge countdown (if active)
-
-- Proper Scanner handling  10. Increment haven days (if in Haven)
-
-- Graceful game flow  11. Loop or end
-
-- 6 Global Interrupts:
-
-#### Phase 8 - Polish & Refinement ✅  - Health ≤ 0 → BadEnd
-
-**Changes in this version**:  - Suspicion ≥ 10 → ArrestedEnd
-
-- ✅ Deleted test files (GameEngineTest.java)  - Morale ≤ 0 → DespairEvent
-
-  - Removed: `src/GameEngineTest.java`  - Energy ≤ 0 → ForcedRest
-
-  - Removed: `test/GameEngineTest.java`  - Haven Days ≥ 20 → HavenPanicEnd
-
-  - Original: 41 tests, 100% pass rate  - Purge Countdown ≤ 0 → PurgeEnd
-
-- ✅ Deleted exception files (for simplified professor version)- 13 Branching Decision Points with random/deterministic outcomes:
-
-  - Removed: `src/exception/InvalidChoiceException.java`  - FastTravel (60/40), SearchTravel (50/50)
-
-  - Removed: `src/exception/GameStateException.java`  - Mingle with rumor selection
-
-- ✅ Added ForcedRest story node (energy = 0 trigger)  - ObserveClinic with visit probability scaling
-
-- ✅ Enhanced TextRenderer with "DAYS IN HAVEN" display  - SearchDorms (50/50), Library with knowledge gate
-
-- ✅ Fixed haven days increment logic  - RiskInformation (50/50), Section1Gate knowledge check
-
-  - **Original Problem**: Incremented every turn (9 days on day 2)  - StealSamples (50/50), FinalCheck knowledge ≥12
-
-  - **Solution**: Increment only on sleep/rest actions  - FinalHeist (50/50), EscapeEnd with Cris relationship branching
-
-  - **Nodes**: LeisurelyRest, RestInDorm, ForcedRest  - PurgeReveal activation
-
-- ✅ Deleted all .class files for clean submission- Polymorphic effect application
-
-- ✅ Zero compilation errors- Input validation with try-catch exception handling
-
-
-
-#### Phase 9 - Documentation ✅**Phase 5 - Special Systems**
-
-- README.md (500+ lines) - Complete game overview- Zone Management:
-
-- CHANGELOG.md (this file) - Version history  - Wasteland → Haven (at Arrival node)
-
-- README_DEVELOPERS.md (1,000+ lines) - Technical architecture  - Haven → Hub (at ResearchHub node)
-
-- PROJECT_COMPLETION_SUMMARY.md (400+ lines) - Completion status  - Haven Days increment each turn in Haven
-
-- TODO.md - Project completion checklist- Purge System:
-
-  - Activation at PurgeReveal node
-
-### 📝 Content  - 7-day countdown decrements each turn
-
-  - Countdown ≤ 0 triggers PurgeEnd
-
-- **61 Story Nodes**: Complete narrative covering all game paths- Clinic Visit Tracking:
-
-- **7 Rumors**: Collectible story elements tracking player knowledge  - Increments on ObserveClinic nodes
-
-- **11 Endings**: Multiple outcomes based on stats and choices  - Affects probability scaling for future clinic encounters
-
-
-
-### 🏗️ Architecture**Phase 6 - Exception Handling**
-
-- InvalidChoiceException: Thrown for invalid player input
-
-```- GameStateException: Thrown for missing nodes/null states
-
-Model Layer:- Try-catch blocks at all input/state validation points
-
-  ├── Player (19 fields, state management)- User-friendly error messages
-
-  ├── StoryNode (content + effects)
-
-  └── Choice (decision + conditions)**Phase 7 - Main Entry Point**
-
+#### Phase 7 - Main Entry Point ✅
 - Welcome screen with ASCII art
+- Game initialization and startup
+- Proper Scanner handling
+- Graceful game flow
 
-Effect Layer:- Game initialization and startup
+#### Phase 8 - Polish & Refinement ✅
+**Changes in this version**:
+- ✅ Deleted test files (GameEngineTest.java)
+- ✅ Deleted exception files (for simplified professor version)
+- ✅ Added ForcedRest story node (energy = 0 trigger)
+- ✅ Enhanced TextRenderer with "DAYS IN HAVEN" display
+- ✅ Fixed haven days increment logic
+- ✅ Deleted all .class files for clean submission
+- ✅ Zero compilation errors
 
-  ├── Effect (interface)- Proper stdin handling (System.in.read())
+#### Phase 9 - Documentation ✅
+- README.md (500+ lines) - Complete game overview
+- CHANGELOG.md (this file) - Version history
+- README_DEVELOPERS.md (1,000+ lines) - Technical architecture
+- PROJECT_COMPLETION_SUMMARY.md (400+ lines) - Completion status
+- TODO.md - Project completion checklist
 
+### 📝 Content
+- **61 Story Nodes**: Complete narrative covering all game paths
+- **7 Rumors**: Collectible story elements tracking player knowledge
+- **11 Endings**: Multiple outcomes based on stats and choices
+
+### 🏗️ Architecture
+```
+Model Layer:
+  ├── Player (19 fields, state management)
+  ├── StoryNode (content + effects)
+  └── Choice (decision + conditions)
+
+Effect Layer:
+  ├── Effect (interface)
   └── 6 implementations (polymorphic)
-
-**Phase 8 - Comprehensive Testing**
-
-Condition Layer:- GameEngineTest.java with 41 unit tests
-
-  ├── Condition (interface)- 100% pass rate (41/41 tests)
-
-  └── 4 implementations (filtering)- Coverage includes:
-
-  - Player model initialization and mutations
-
-Engine Layer:  - All 6 effect types
-
-  ├── GameEngine (main loop, interrupts, branching)  - All 4 condition types
-
-  ├── StoryData (61 nodes, 7 rumors)  - Choice filtering
-
-  └── TextRenderer (UI display)  - Rumor system
-
-```  - Integration tests
-
-  - Game flow sequences
-
-### 🔑 Key Features  - Interrupt conditions
-
-
-
-- **Polymorphism**: Full effect and condition system using interfaces**Phase 9 - Documentation**
-
-- **Encapsulation**: Player model with validated state mutations- Updated README.md with complete game information
-
-- **Abstraction**: GameEngine hides complex loop and branching logic- Comprehensive CHANGELOG.md (this file)
-
-- **Simplified Errors**: If/else validation without custom exceptions- README_DEVELOPERS.md with architecture documentation
-
-- **Relationships**: Dynamic story outcomes based on Cris relationship
-
-- **Zone System**: Three-zone progression (Wasteland → Haven → Hub)#### 📝 Content
-
-- **Resource Management**: Energy capping, suspicion thresholds, morale tracking
-
-- **Rumor Tracking**: Persistent player knowledge of story elements- **61 Story Nodes**: Complete narrative covering all game paths
-
-- **Rest System**: Three rest nodes with intelligent time progression- **7 Rumors**: Collectible story elements tracking player knowledge
-
-- **Haven Days Tracking**: Separate time counter for Haven location- **12 Endings**: Multiple outcomes based on stats and choices
-
-
-
-### 📊 Final Metrics#### 🏗️ Architecture
-
-
-
-- **Java Files**: 17 (Main + 3 model + 6 effect + 4 condition + 2 engine + ui)```
-
-- **Interfaces**: 2 (Effect, Condition)Model Layer:
-
-- **Story Nodes**: 61  ├── Player (19 fields, state management)
-
-- **Branching Points**: 13  ├── StoryNode (content + effects)
-
-- **Global Interrupts**: 6  └── Choice (decision + conditions)
-
-- **Lines of Code**: ~2,000 LOC
-
-- **Compilation Errors**: 0Effect Layer:
-
-- **Documentation**: 2,000+ lines  ├── Effect (interface)
-
-  └── 6 implementations (polymorphic)
-
----
 
 Condition Layer:
-
-## [v1.1] - 2025-11-26  ├── Condition (interface)
-
+  ├── Condition (interface)
   └── 4 implementations (filtering)
 
-### Initial Narrative Foundation
-
 Engine Layer:
-
-- Story nodes ported from design document  ├── GameEngine (main loop, interrupts, branching)
-
-- Folder structure established  ├── StoryData (61 nodes, 7 rumors)
-
-- TextRenderer UI framework implemented  └── TextRenderer (UI display)
-
-- Player, Choice, StoryNode models defined
-
-- Condition and Effect system designException Layer:
-
-  ├── InvalidChoiceException
-
----  └── GameStateException
-
+  ├── GameEngine (main loop, interrupts, branching)
+  ├── StoryData (61 nodes, 7 rumors)
+  └── TextRenderer (UI display)
 ```
 
-## [v1.0] - Initial Concept
-
-#### 🔑 Key Improvements Over v1.1
-
-- Game concept and narrative outline
-
-- Project structure planning- **Polymorphism**: Full effect and condition system using interfaces
-
-- Architecture design discussions- **Encapsulation**: Player model with validated state mutations
-
+### 🔑 Key Features
+- **Polymorphism**: Full effect and condition system using interfaces
+- **Encapsulation**: Player model with validated state mutations
 - **Abstraction**: GameEngine hides complex loop and branching logic
-- **Exception Handling**: Custom exceptions with try-catch blocks
-- **Testing**: 41-test unit test suite with 100% pass rate
+- **Simplified Errors**: If/else validation without custom exceptions
 - **Relationships**: Dynamic story outcomes based on Cris relationship
 - **Zone System**: Three-zone progression (Wasteland → Haven → Hub)
 - **Resource Management**: Energy capping, suspicion thresholds, morale tracking
 - **Rumor Tracking**: Persistent player knowledge of story elements
+- **Rest System**: Three rest nodes with intelligent time progression
+- **Haven Days Tracking**: Separate time counter for Haven location
 
-#### 📊 Metrics
-
-- **Classes**: 17 (Player, 3 model + GameEngine/StoryData/TextRenderer, 7 effect, 4 condition, 2 exception, Main)
+### 📊 Final Metrics
+- **Java Files**: 17 (Main + 3 model + 6 effect + 4 condition + 2 engine + ui)
 - **Interfaces**: 2 (Effect, Condition)
 - **Story Nodes**: 61
 - **Branching Points**: 13
 - **Global Interrupts**: 6
-- **Test Cases**: 41 (100% pass rate)
-- **Lines of Code**: ~3,000+ (engine, models, effects, conditions)
+- **Lines of Code**: ~2,000 LOC
+- **Compilation Errors**: 0
+- **Documentation**: 2,000+ lines
 
 ---
 
 ## [v1.1] - 2025-11-26
 
 ### Initial Narrative Foundation
-
-- Story nodes ported from "save point 2"
+- Story nodes ported from design document
 - Folder structure established
 - TextRenderer UI framework implemented
 - Player, Choice, StoryNode models defined
-- Placeholder for effects and conditions systems
+- Condition and Effect system design
 
 ---
 
 ## [v1.0] - Initial Concept
-
 - Game concept and narrative outline
 - Project structure planning
 - Architecture design discussions

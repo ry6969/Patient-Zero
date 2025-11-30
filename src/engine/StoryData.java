@@ -365,7 +365,7 @@ public class StoryData {
         restInDorm.addEffect(new DayEffect(1));
         restInDorm.addEffect(new MoraleEffect(1));
         restInDorm.addEffect(new EnergyEffect(5));
-        restInDorm.addChoice(new Choice("(Auto-continues to next day)", null, "HavenIntro"));
+        restInDorm.addChoice(new Choice("Continue to Next Day", null, "HavenIntro"));
         storyNodes.put(restInDorm.getId(), restInDorm);
 
         // ================= ACT 3: PURGE PROTOCOL =================
@@ -380,10 +380,7 @@ public class StoryData {
 
         StoryNode researchHub = new StoryNode("ResearchHub",
             "RESEARCH HUB VENTS - A maze of metal and whispered secrets\n" +
-            "Goal: 12 Knowledge to expose the truth.\n\n" +
-            "PURGE COUNTDOWN: (Track days remaining)\n" +
-            "Current Knowledge: (Show current/12)\n" +
-            "Energy remaining: (Show current/max)");
+            "Goal: 12 Knowledge to expose the truth.\n\n");
         researchHub.addChoice(new Choice("\"I'll steal lab samples.\"", "High risk, but necessary (Random: +3 Knowledge OR -3 Health +3 Suspicion, -1 Energy)", "StealSamples"));
         researchHub.addChoice(new Choice("\"I'll spy on guard conversations.\"", "Learn what I can safely (+1 Knowledge, -1 Energy)", "SpyGuards"));
         researchHub.addChoice(new Choice("\"I'll question a friendly scientist.\"", "Find allies in the system (+2 Knowledge +2 Suspicion, -1 Energy)", "TalkScientist"));

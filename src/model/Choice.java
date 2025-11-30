@@ -9,6 +9,7 @@ public class Choice {
     private String subtext;
     private String nextNodeId;
     private List<Condition> conditions;
+    private boolean inverted = false;
 
     public Choice(String text, String subtext, String nextNodeID){
         this.text = text;
@@ -36,13 +37,28 @@ public class Choice {
     public List<Condition> getConditions() {
         return conditions;
     }
+
+    public void setInverted(boolean inverted) {
+        this.inverted = inverted;
+    }
+
+    public boolean isInverted() {
+        return inverted;
+    }
     
     public boolean isAvailable(Player player) {
+        boolean conditionsMet = true;
         for (Condition condition : conditions) {
             if (!condition.isMet(player)) {
-                return false;
+                conditionsMet = false;
+                break;
             }
         }
-        return true;
+
+        if (inverted) {
+            return !conditionsMet;
+        }
+
+        return conditionsMet;
     }
 }

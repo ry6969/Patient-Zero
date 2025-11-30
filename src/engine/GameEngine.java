@@ -22,7 +22,7 @@ public class GameEngine {
     private boolean gameRunning;
 
     public GameEngine() {
-        this.player = new Player(10, 5, 0, 0, 0); // health, energy, knowledge, suspicion, day
+        this.player = new Player(10, 5, 0, 0, 1); // health, energy, knowledge, suspicion, day
         this.scanner = new Scanner(System.in);
         this.random = new Random();
         this.gameRunning = false;
@@ -39,7 +39,10 @@ public class GameEngine {
         TextRenderer.printWelcomeScreen(); 
         scanner.nextLine();
 
+        applyEffects(currentNode, player); // 
+
         while (gameRunning) {
+
             // 1. Check global interrupts first
             if (checkInterrupts()) {
                 continue; // Interrupt handled, loop continues or ends
@@ -58,16 +61,13 @@ public class GameEngine {
             // 5. Get the chosen choice
             Choice chosenChoice = availableChoices.get(choiceIndex);
 
-            // 6. Apply effects from the current node
-            applyEffects(currentNode, player);
-
-            // 7. Handle special node effects (zone changes, flags, tracking)
+            // 6. Handle special node effects (zone changes, flags, tracking)
             handleSpecialNodeEffects(currentNode.getId(), player);
 
-            // 8. Get the next node ID (may be a branching point)
+            // 7. Get the next node ID (may be a branching point)
             String nextNodeId = getNextNodeId(chosenChoice.getNextNodeId(), player);
 
-            // 9. Move to next node
+            // 8. Move to next node
             currentNode = StoryData.getNode(nextNodeId);
 
             if (currentNode == null) {
@@ -76,6 +76,9 @@ public class GameEngine {
                 break;
             }
 
+            // 9. Apply effects to the new node here 
+            applyEffects(currentNode, player);
+
             // 10. Decrement purge countdown if active
             if (player.isPurgeActive()) {
                 player.setPurgeCountdown(player.getPurgeCountdown() - 1);
@@ -83,6 +86,7 @@ public class GameEngine {
         }
 
         scanner.close();
+        
     }
 
     //Handle special node effects like zone changes, flag setting, and tracking
@@ -91,6 +95,7 @@ public class GameEngine {
             // Zone changes
             case "Arrival":
                 player.setZone("Haven");
+                player.setHavenDays(1); // setting days in haven to 1 after arriving
                 break;
 
             case "ResearchHub":
@@ -295,7 +300,12 @@ public class GameEngine {
 
     //MINGLE branching: Pick random unheard rumor or nothing
     private String branchMingle() {
-        if (player.hasUnheardRumors()) {
+            if (player.getKnowledge() >= 4 || !player.hasUnheardRumors()) { // knowledge cap at 4
+            return "Mingle_Nothing";
+        }
+
+            // 70% chance to hear a rumor, 30% chance to hear nothing
+        if (random.nextDouble() < 0.7) {
             // Get random unheard rumor index
             int[] unheardIndices = player.getUnheardIndices();
             int randomIndex = unheardIndices[random.nextInt(unheardIndices.length)];
@@ -303,17 +313,20 @@ public class GameEngine {
             // Mark it as heard
             player.markRumorHeard(randomIndex);
 
-            // Fetch and display rumor text
+            StoryNode rumorNode = StoryData.getNode("Mingle_Rumor");
             String rumorText = StoryData.RUMORS[randomIndex];
-            System.out.println("\n[RUMOR DISCOVERED]");
-            System.out.println("\"" + rumorText + "\"");
+
+            String newStory = "You listen to the refugees' whispered conversations.\n\n" +
+                "[RUMOR DISCOVERED]\n" +
+                "\"" + rumorText + "\"\n" +
+                "(Knowledge +1)\n";
+            rumorNode.setStory(newStory);
 
             return "Mingle_Rumor";
         } else {
             return "Mingle_Nothing";
         }
     }
-
     /**
      * ESCAPE END branching: Depends on Cris relationship
      */

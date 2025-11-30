@@ -72,6 +72,8 @@ public class TextRenderer {
         System.out.println("DAY: " + player.getDay());
         if (player.getZone().equals("Haven")) {
             System.out.println("DAYS IN HAVEN: " + player.getHavenDays());
+        } else if (player.getZone().equals("Hub")) {
+            System.out.println("Purge Countdown: " + player.getPurgeCountdown());
         }
         printSingleBorder();
     }
