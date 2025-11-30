@@ -491,17 +491,17 @@ Enter Action Number:
 <tr>
 <td><strong>Bueno, Basty A.</strong></td>
 <td>Lead Developer</td>
-<td>Game engine architecture, effect system, branching logic</td>
+<td>Story writing, game engine architecture, effect system, branching logic, bug fixes</td>
 </tr>
 <tr>
 <td><strong>Canalita, Harry D.</strong></td>
 <td>Developer</td>
-<td>Story nodes, condition system, testing & bug fixes</td>
+<td>Game engine architecture, Story nodes, condition system, documentaion, bug fixes</td>
 </tr>
 <tr>
 <td><strong>Manalo, Cris Julian V.</strong></td>
 <td>Developer</td>
-<td>Player model, UI rendering, documentation</td>
+<td>Player model, UI rendering, documentation, testing & bug fixes</td>
 </tr>
 </table>
 
