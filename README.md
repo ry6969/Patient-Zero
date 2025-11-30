@@ -296,7 +296,7 @@ The project follows a clean **three-layer architecture** separating concerns:
 
 ### Step 1: Navigate to Project Directory
 ```bash
-cd "/home/ry/Documents/School Projects/Patient Zero"
+cd "/home/user/Documents/School Projects/Patient Zero"
 ```
 *(Adjust path based on your actual project location)*
 
