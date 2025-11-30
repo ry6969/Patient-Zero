@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## [v2.2] - 2025-12-01 (Critical Bug Fixes)
+## [v2.2] - 2025-12-01 (Critical Bug Fixes & Energy Condition System)
 
 ### 🐛 BUG FIXES
 
@@ -45,6 +45,29 @@ restChoice.addCondition(new EnergyCondition(1));
 restChoice.setInverted(true); // Shows only when energy < 1
 ```
 
+#### StoryData.java - Energy-Based Choice Gating
+**Major Enhancement**: Implemented comprehensive energy requirement system to prevent actions when energy is depleted.
+
+**Changes**:
+1. **Arrival Node** - Added conditional paths based on energy:
+   - `regularArrival` choice requires `EnergyCondition(1)` (shows when energy ≥ 1)
+   - `collapseChoice` uses inverted `EnergyCondition(1)` (shows only when energy = 0)
+   
+2. **HavenIntro Node** - All activity choices now require energy:
+   - All exploration/activity choices (`Mingle`, `ObserveClinic`, `SearchDorms`, `Library`, `WorkKitchen`, `CleaningDuty`, `ShareFood`, `DormNight`) now require `EnergyCondition(1)`
+   - `riskChoice` ("main office") requires `EnergyCondition(2)` and uses inverted `SuspicionCondition(7)`
+   - `restChoice` ("rest for tomorrow") uses inverted `EnergyCondition(1)` - **only shows when energy = 0**
+   
+3. **ResearchHub Node** - Added energy-based rest gating:
+   - `restActionChoice` ("must rest") uses inverted `EnergyCondition(1)` - **only shows when energy = 0**
+
+**Impact**: 
+- Prevents players from taking actions when exhausted (energy = 0)
+- Forces players to rest when energy depleted
+- Only "Rest" options appear when energy reaches 0
+- Creates more strategic energy management gameplay
+- Better reflects narrative realism (can't explore while exhausted)
+
 #### StoryNode.java
 - Added `setStory(String newStory)` method to support dynamic story text updates (used by enhanced rumor system)
 
@@ -60,12 +83,19 @@ The variable shadowing bug occurred because:
 
 **Solution**: Removed duplicate field declarations, allowing child classes to properly inherit and use the parent's `amount` field.
 
+**Energy Condition System Architecture**:
+1. **Individual Choice Objects**: Changed from inline `addChoice()` calls to named Choice objects
+2. **Conditional Gating**: Applied `EnergyCondition` to all energy-consuming actions
+3. **Inverted Logic**: Used `setInverted(true)` on rest choices to show only when needed
+4. **Result**: Dynamic choice availability based on player energy state
+
 ### 🎯 Impact
 
 - **Critical**: Game stats now work as intended - players can progress through the game
 - **Quality of Life**: Starting at Day 1 instead of Day 0 feels more natural
-- **Balance**: Rumor knowledge cap prevents exploitation
+- **Balance**: Rumor knowledge cap prevents exploitation; energy requirements add strategic depth
 - **Flexibility**: Inverted conditions enable more sophisticated choice gating
+- **Realism**: Energy depletion now properly forces rest, preventing unrealistic exhausted exploration
 
 ---
 

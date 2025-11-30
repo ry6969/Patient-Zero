@@ -538,7 +538,7 @@ Special appreciation to all teammates for their dedication, collaborative proble
 2. **Make choices** by entering the choice number (1-9 typically)
 3. **Manage stats**:
    - **Health**: Drop to ≤0 = BadEnd
-   - **Energy**: Required for activities (0-5 capped). When energy hits 0, triggers ForcedRest
+   - **Energy**: Required for most activities (0-5 capped). When energy = 0, most exploration choices disappear and only rest options remain. When energy hits 0, triggers ForcedRest interrupt.
    - **Knowledge**: Unlock choices at 5+ and 7+ thresholds
    - **Suspicion**: Hit 10 = ArrestedEnd
    - **Morale**: Drop to ≤0 = DespairEvent

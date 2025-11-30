@@ -83,10 +83,24 @@ public class StoryData {
         StoryNode journeyChoices = new StoryNode("JourneyChoices",
             "You stand at the edge of the dead city, looking toward where Haven supposedly lies. " +
             "The journey won't be easy. Each path costs energy—choose wisely.");
-        journeyChoices.addChoice(new Choice("\"I'll take the safe route through the sewers.\"", "Slow but steady (-1 Energy)", "SlowTravel"));
-        journeyChoices.addChoice(new Choice("\"I'll risk the open route for speed.\"", "Fast but dangerous (-2 Energy)", "FastTravel"));
-        journeyChoices.addChoice(new Choice("\"Let me search for supplies first.\"", "Risk vs reward (-2 Energy)", "SearchTravel"));
-        journeyChoices.addChoice(new Choice("\"I need to rest before continuing.\"", "No energy left", "RestBeforeJourney"));
+
+        Choice slowTravelChoice = new Choice("\"I'll take the safe route through the sewers.\"", "Slow but steady (-1 Energy)", "SlowTravel"); // when there's energy lalabas toh
+        slowTravelChoice.addCondition(new EnergyCondition(1)); //
+        journeyChoices.addChoice(slowTravelChoice); //
+
+        Choice fastTravelChoice = new Choice("\"I'll risk the open route for speed.\"", "Fast but dangerous (-2 Energy)", "FastTravel"); //
+        fastTravelChoice.addCondition(new EnergyCondition(2)); //
+        journeyChoices.addChoice(fastTravelChoice); //
+
+        Choice searchTravelChoice = new Choice("\"Let me search for supplies first.\"", "Risk vs reward (-2 Energy)", "SearchTravel"); //
+        searchTravelChoice.addCondition(new EnergyCondition(2)); //
+        journeyChoices.addChoice(searchTravelChoice); //
+
+        Choice restChoice2 = new Choice("\"I need to rest before continuing.\"", "No energy left", "RestBeforeJourney"); // pag wala na energy, only this option shows
+        restChoice2.addCondition(new EnergyCondition(1)); //
+        restChoice2.setInverted(true); //
+        journeyChoices.addChoice(restChoice2); //
+ 
         storyNodes.put(journeyChoices.getId(), journeyChoices);
 
         StoryNode restBeforeJourney = new StoryNode("RestBeforeJourney",
@@ -156,14 +170,14 @@ public class StoryData {
             "You try to reach him, but the crowd surges and he's gone. Still, you've made it inside.");
         arrival.addEffect(new MoraleEffect(2));
 
-        Choice collapseChoice = new Choice("\"I can't... keep going...\" (Collapse)", "If no energy left", "ArrivalCollapse");
-        collapseChoice.addCondition(new EnergyCondition(1));
-        collapseChoice.setInverted(true);
-        arrival.addChoice(collapseChoice);
+        Choice collapseChoice = new Choice("\"I can't... keep going...\" (Collapse)", "If no energy left", "ArrivalCollapse"); //
+        collapseChoice.addCondition(new EnergyCondition(1)); //
+        collapseChoice.setInverted(true); //
+        arrival.addChoice(collapseChoice); //
 
-        Choice regularArrival = new Choice("\"Find a bunk and settle in.\"", "If you have energy", "HavenIntro");
-        regularArrival.addCondition(new EnergyCondition(1));
-        arrival.addChoice(regularArrival);
+        Choice regularArrival = new Choice("\"Find a bunk and settle in.\"", "If you have energy", "HavenIntro"); //
+        regularArrival.addCondition(new EnergyCondition(1)); //
+        arrival.addChoice(regularArrival); //
 
         storyNodes.put(arrival.getId(), arrival);
 
@@ -183,9 +197,9 @@ public class StoryData {
             "You are in the refugees' quarters, a converted gymnasium filled with cots.\n" +
             "People keep to themselves, avoiding eye contact. Something's not right here.");
 
-        Choice mingleChoice = new Choice("\"I should listen to what people are saying.\"", "Maybe I can learn something useful... (-1 Energy)", "Mingle");
-        mingleChoice.addCondition(new EnergyCondition(1));
-        havenIntro.addChoice(mingleChoice);
+        Choice mingleChoice = new Choice("\"I should listen to what people are saying.\"", "Maybe I can learn something useful... (-1 Energy)", "Mingle"); // only shows when there is energy
+        mingleChoice.addCondition(new EnergyCondition(1)); //
+        havenIntro.addChoice(mingleChoice); //
 
         Choice observeClinicChoice = new Choice("\"The medical wing seems important...\"", "What are they really doing in there? (-1 Energy)", "ObserveClinic");
         observeClinicChoice.addCondition(new EnergyCondition(1));
@@ -197,7 +211,7 @@ public class StoryData {
         
         Choice libraryChoice = new Choice("\"The library might have answers.\"", "I need to understand the science behind this (Needs 5+ Knowledge, -1 Energy)", "Library");
         libraryChoice.addCondition(new KnowledgeCondition(5));
-        libraryChoice.addCondition(new EnergyCondition(1));
+        libraryChoice.addCondition(new EnergyCondition(1));    //
         havenIntro.addChoice(libraryChoice);
         
         Choice workKitchenChoice = new Choice("\"Help in the kitchen.\"", "Blend in with workers (-1 Energy)", "WorkKitchen");
@@ -216,13 +230,13 @@ public class StoryData {
         
         Choice riskChoice = new Choice("\"I'm going for the main office. No more playing safe.\"", "Time for desperate measures (High suspicion only, -2 Energy)", "RiskInformation");
         riskChoice.addCondition(new SuspicionCondition(7));
-        riskChoice.addCondition(new EnergyCondition(2));
+        riskChoice.addCondition(new EnergyCondition(2)); //
         riskChoice.setInverted(true);
         havenIntro.addChoice(riskChoice);
         
         Choice dormNightChoice = new Choice("\"Tonight's the night. Time to meet Cris.\"", "This could be my only chance (After meeting scientist, -1 Energy)", "DormNight");
         dormNightChoice.addCondition(new FlagCondition("metScientist", true));
-        dormNightChoice.addCondition(new EnergyCondition(1));
+        dormNightChoice.addCondition(new EnergyCondition(1)); //
         havenIntro.addChoice(dormNightChoice);
 
         Choice restChoice = new Choice("\"I need to rest for tomorrow.\"", "Completely exhausted", "RestInDorm");
@@ -401,7 +415,7 @@ public class StoryData {
         restInDorm.addEffect(new DayEffect(1));
         restInDorm.addEffect(new MoraleEffect(1));
         restInDorm.addEffect(new EnergyEffect(5));
-        restInDorm.addChoice(new Choice("Continue to Next Day", null, "HavenIntro"));
+        restInDorm.addChoice(new Choice("(Auto-continues to next day)", null, "HavenIntro"));
         storyNodes.put(restInDorm.getId(), restInDorm);
 
         // ================= ACT 3: PURGE PROTOCOL =================
@@ -416,16 +430,19 @@ public class StoryData {
 
         StoryNode researchHub = new StoryNode("ResearchHub",
             "RESEARCH HUB VENTS - A maze of metal and whispered secrets\n" +
-            "Goal: 12 Knowledge to expose the truth.\n\n");
+            "Goal: 12 Knowledge to expose the truth.\n\n" +
+            "PURGE COUNTDOWN: (Track days remaining)\n" +
+            "Current Knowledge: (Show current/12)\n" +
+            "Energy remaining: (Show current/max)");
         researchHub.addChoice(new Choice("\"I'll steal lab samples.\"", "High risk, but necessary (Random: +3 Knowledge OR -3 Health +3 Suspicion, -1 Energy)", "StealSamples"));
         researchHub.addChoice(new Choice("\"I'll spy on guard conversations.\"", "Learn what I can safely (+1 Knowledge, -1 Energy)", "SpyGuards"));
         researchHub.addChoice(new Choice("\"I'll question a friendly scientist.\"", "Find allies in the system (+2 Knowledge +2 Suspicion, -1 Energy)", "TalkScientist"));
         researchHub.addChoice(new Choice("\"I'm ready to confront the truth.\"", "No turning back now", "FinalCheck"));
         
-        Choice restActionChoice = new Choice("\"I must rest... no energy left.\"", "Completely exhausted", "RestAction");
-        restActionChoice.addCondition(new EnergyCondition(1));
-        restActionChoice.setInverted(true);
-        researchHub.addChoice(restActionChoice);
+        Choice restActionChoice = new Choice("\"I must rest... no energy left.\"", "Completely exhausted", "RestAction"); //
+        restActionChoice.addCondition(new EnergyCondition(1)); //
+        restActionChoice.setInverted(true); //
+        researchHub.addChoice(restActionChoice); //
         storyNodes.put(researchHub.getId(), researchHub);
 
         StoryNode stealSamplesSuccess = new StoryNode("StealSamples_Success",
