@@ -4,6 +4,7 @@ import model.Player;
 
 //Effect that advances the player's day counter.
 public class DayEffect extends Effect {
+    // Removed private int amount
 
     public DayEffect(int amount) {
         super(amount);
@@ -12,5 +13,10 @@ public class DayEffect extends Effect {
     @Override
     public void apply(Player player) {
         player.advanceDay(amount);
+
+        // Decrement purge countdown if active
+        if (player.isPurgeActive()) {
+            player.setPurgeCountdown(player.getPurgeCountdown() - 1);
+        }
     }
 }
