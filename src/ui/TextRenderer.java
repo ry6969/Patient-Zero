@@ -63,19 +63,20 @@ public class TextRenderer {
         System.out.print("|");
         for (String stat : stats) {
             int padding = (COLUMN_WIDTH - stat.length()) / 2;
-
             System.out.print(" ".repeat(padding) + stat + " ".repeat(padding) + "|");
         }
         System.out.println();
 
         printDoubleBorder();
         System.out.println("DAY: " + player.getDay());
-        if (player.getZone().equals("Haven")) {
+
+        if (player.isPurgeActive()) {
+            System.out.println("KNOWLEDGE: " + player.getKnowledge() + "/12 (Goal)");
+            System.out.println("Purge Countdown: " + player.getPurgeCountdown() + " days");
+        } else if (player.getZone().equals("Haven")) {
             System.out.println("DAYS IN HAVEN: " + player.getHavenDays());
-        } else if (player.getZone().equals("Hub")) {
-            System.out.println("Purge Countdown: " + player.getPurgeCountdown());
         }
-        printSingleBorder();
+        printSingleBorder(); 
     }
 
 
