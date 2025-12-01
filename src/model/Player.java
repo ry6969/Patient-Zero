@@ -14,9 +14,12 @@ public class Player {
     private int havenDays;
     private int purgeCountdown;
     private boolean purgeActive;
-    private int clinicVisits;
     private boolean metScientist;
     private int crisRelationship;
+    private int dormSearches;
+    private int rationsShared;
+    private int clinicObservations;
+    
     
     // Rumor Tracking (7 rumors total, indexed 0-6)
     private boolean[] heardRumors;
@@ -26,8 +29,8 @@ public class Player {
 
     // Constructor
     public Player(int health, int energy, int knowledge, int suspicion, int day) {
-        this.health = health;
-        this.energy = energy;
+        this.health = Math.min(health, 10); // cap at 10
+        this.energy = Math.min(energy, 5); // cap at 5
         this.knowledge = knowledge;
         this.suspicion = suspicion;
         this.day = day;
@@ -37,8 +40,6 @@ public class Player {
         this.zone = "Wasteland"; // Starting zone
         this.havenDays = 0;
         this.purgeCountdown = 0;
-        this.purgeActive = false;
-        this.clinicVisits = 0;
         this.metScientist = false;
         this.crisRelationship = 0;
         
@@ -46,6 +47,9 @@ public class Player {
         
         this.metScavenger = false;
         this.jaxRelationship = 0;
+        this.dormSearches = 0;
+        this.rationsShared = 0;
+        this.clinicObservations = 0;
     }
 
     // CORE STAT GETTERS
@@ -92,10 +96,6 @@ public class Player {
         return purgeActive;
     }
 
-    public int getClinicVisits() {
-        return clinicVisits;
-    }
-
     public boolean hasMetScientist() {
         return metScientist;
     }
@@ -115,11 +115,11 @@ public class Player {
     // CORE STAT SETTERS
     
     public void setHealth(int health) {
-        this.health = health;
+        this.health = Math.min(health, 10);;
     }
 
     public void setEnergy(int energy) {
-        this.energy = energy;
+        this.energy = Math.min(energy, 5); 
     }
 
     public void setKnowledge(int knowledge) {
@@ -137,7 +137,7 @@ public class Player {
     // ADDITIONAL STAT SETTERS
     
     public void setMorale(int morale) {
-        this.morale = morale;
+        this.morale = Math.min(morale, 10);
     }
 
     public void setZone(String zone) {
@@ -154,10 +154,6 @@ public class Player {
 
     public void setPurgeActive(boolean purgeActive) {
         this.purgeActive = purgeActive;
-    }
-
-    public void setClinicVisits(int clinicVisits) {
-        this.clinicVisits = clinicVisits;
     }
 
     public void setMetScientist(boolean metScientist) {
@@ -180,6 +176,7 @@ public class Player {
     
     public void changeHealth(int num) {
         this.health += num;
+        this.health = Math.min(this.health, 10);  // Cap at 10
     }
 
     public void changeEnergy(int num) {
@@ -204,6 +201,7 @@ public class Player {
 
     public void changeMorale(int num) {
         this.morale += num;
+        this.morale = Math.min(this.morale, 10);  // Cap at 10
     }
 
     public void advanceDay(int num) {
@@ -218,10 +216,6 @@ public class Player {
         if (this.purgeActive && this.purgeCountdown > 0) {
             this.purgeCountdown--;
         }
-    }
-
-    public void incrementClinicVisits() {
-        this.clinicVisits++;
     }
 
     public void changeCrisRelationship(int num) {
@@ -292,4 +286,43 @@ public class Player {
         }
         return false;
     }
+
+    public int getDormSearches() {
+        return dormSearches;
+    }
+
+    public void setDormSearches(int dormSearches) {
+        this.dormSearches = dormSearches;
+    }
+
+    public void incrementDormSearches() {
+        this.dormSearches++;
+    }
+
+
+    public int getRationsShared() {
+        return rationsShared;
+    }
+
+    public void setRationsShared(int rationsShared) {
+        this.rationsShared = rationsShared;
+    }
+
+    public void incrementRationsShared() {
+        this.rationsShared++;
+    }
+
+    public int getClinicObservations() {
+        return clinicObservations;
+    }
+
+    public void setClinicObservations(int clinicObservations) {
+        this.clinicObservations = clinicObservations;
+    }
+
+    public void incrementClinicObservations() {
+        this.clinicObservations++;
+    }
 }
+
+
