@@ -63,7 +63,7 @@ public class GameEngine {
 
             // 6. Handle special node effects (zone changes, flags, tracking)
             handleSpecialNodeEffects(currentNode.getId(), player);
-
+            
             // 7. Get the next node ID (may be a branching point)
             String nextNodeId = getNextNodeId(chosenChoice.getNextNodeId(), player);
 
@@ -78,13 +78,7 @@ public class GameEngine {
 
             // 9. Apply effects to the new node here 
             applyEffects(currentNode, player);
-
-            // 10. Decrement purge countdown if active
-            if (player.isPurgeActive()) {
-                player.setPurgeCountdown(player.getPurgeCountdown() - 1);
-            }
         }
-
         scanner.close();
         
     }
@@ -102,19 +96,12 @@ public class GameEngine {
                 player.setZone("Hub");
                 break;
 
-            // Tracking updates
-            case "ObserveClinic_Caught":
-            case "ObserveClinic_Learn":
-                player.setClinicVisits(player.getClinicVisits() + 1);
-                break;
-
             // Sleep/Rest actions - increment haven days only when sleeping in Haven
-            case "LeisurelyRest":
             case "RestInDorm":
             case "ForcedRest":
                 if (player.getZone().equals("Haven")) {
                     player.setHavenDays(player.getHavenDays() + 1);
-                }
+                } 
                 break;
 
             // No special effects for other nodes
@@ -146,23 +133,41 @@ public class GameEngine {
             return true;
         }
 
-        // Morale ≤ 0 → DespairEvent
+        // Morale ≤ 0 → Despression Spiral
         if (player.getMorale() <= 0) {
-            currentNode = StoryData.getNode("DespairEvent");
+            currentNode = StoryData.getNode("DepressionSpiral");
             TextRenderer.clearScreen();
-            List<Choice> despairChoices = getAvailableChoices(currentNode);
-            TextRenderer.printGameScreen(player, currentNode.getStory(), despairChoices);
-            int choiceIndex = getPlayerInput(despairChoices.size()) - 1;
-            Choice chosen = despairChoices.get(choiceIndex);
+            List<Choice> spiralChoices = getAvailableChoices(currentNode);
+            TextRenderer.printGameScreen(player, currentNode.getStory(), spiralChoices);
+
+            scanner.nextLine(); 
+
             applyEffects(currentNode, player);
-            String nextNodeId = getNextNodeId(chosen.getNextNodeId(), player);
-            currentNode = StoryData.getNode(nextNodeId);
+
+            if (player.getZone().equals("Haven")) {
+                player.advanceHavenDays(3); // Match the 3 days from DayEffect
+            }
+
+            handleSpecialNodeEffects(currentNode.getId(), player);
+            if (player.isPurgeActive()) {
+                currentNode = StoryData.getNode("ResearchHub");
+            } else {
+                currentNode = StoryData.getNode("HavenIntro");
+            }
+
             return true;
         }
 
         // Energy ≤ 0 → ForcedRest
         if (player.getEnergy() <= 0) {
-            currentNode = StoryData.getNode("ForcedRest");
+            player.changeHealth(-1); // -1 Health when collapsing from exhaustion
+
+            if (player.isPurgeActive()) {
+               currentNode = StoryData.getNode("ForcedRest_Hub"); // Use Hub version
+            } else {
+                currentNode = StoryData.getNode("ForcedRest"); // Use normal version
+            }
+
             TextRenderer.clearScreen();
             List<Choice> forcedRestChoices = getAvailableChoices(currentNode);
             TextRenderer.printGameScreen(player, currentNode.getStory(), forcedRestChoices);
@@ -175,8 +180,8 @@ public class GameEngine {
             return true;
         }
 
-        // Haven days ≥ 20 (no purge) → HavenPanicEnd
-        if (player.getHavenDays() >= 20 && !player.isPurgeActive()) {
+        // Haven days ≥ 15 (no purge) → HavenPanicEnd
+        if (player.getHavenDays() >= 15 && !player.isPurgeActive()) {
             TextRenderer.clearScreen();
             TextRenderer.printGameScreen(player, StoryData.getNode("HavenPanicEnd").getStory(), new ArrayList<>());
             System.out.println("\n[END OF GAME]");
@@ -253,15 +258,70 @@ public class GameEngine {
                 return branchMingle();
 
             case "ObserveClinic":
-                // 30% base + 10% per clinic visit
-                double catchChance = 0.3 + (0.1 * player.getClinicVisits());
-                return (random.nextDouble() < catchChance) ? "ObserveClinic_Caught" : "ObserveClinic_Learn";
+            
+            if (player.getClinicObservations() == 0) {
+                player.incrementClinicObservations();
+                return "ObserveClinic_Learn";
+            } else if (player.getClinicObservations() == 1) {
+                if (random.nextDouble() < 0.6) { 
+                    player.incrementClinicObservations();
+                    return "ObserveClinic_Learn2";
+                } else {
+                    return "ObserveClinic_Caught"; 
+                }
+            } else {
+                return "ObserveClinic_HeavyGuards";
+            }
 
             case "SearchDorms":
-                return (random.nextDouble() < 0.5) ? "SearchDorms_Caught" : "SearchDorms_FindNote";
+
+            player.incrementDormSearches();
+            
+            boolean noteFound = player.getKnowledge() > 0; 
+            
+            if (!noteFound) {
+                // Keep searching until note is found
+                if (player.getDormSearches() == 1) {
+                    // First search attempt
+                    double roll = random.nextDouble();
+                    if (roll < 0.7) {
+                        return "SearchDorms_FindNote"; 
+                    } else if (roll < 0.5) {
+                        return "SearchDorms_Caught";
+                    } else {
+                        return "SearchDorms_Nothing";
+                    }
+                } else {
+                    double roll = random.nextDouble();
+                    if (roll < 0.75) { 
+                        return "SearchDorms_FindNote"; 
+                    } else if (roll < 0.4) {
+                        return "SearchDorms_Caught";
+                    } else {
+                        return "SearchDorms_Nothing";
+                    }
+                }
+            } else {
+                return (random.nextDouble() < 0.5) ? "SearchDorms_Caught" : "SearchDorms_NoMore";
+            }
+
+            case "ShareFood":
+                if (player.getRationsShared() >= 2) {
+                    return "NoMoreRations"; // refuse to share more
+                }
+                return "ShareFood";
+
+            case "ShareFood_GiveAll":
+            case "ShareFood_StillGive":
+                player.incrementRationsShared();
+                return choiceNodeId;
+
+            case "ShareFood_Limit":
+            case "ShareFood_Starve":
+                return choiceNodeId;
 
             case "Library":
-                if (player.getKnowledge() < 7) {
+                if (player.getKnowledge() < 6) {
                     return "Library_LowKnowledge";
                 } else {
                     player.setMetScientist(true); // Flag: met the scientist
@@ -278,6 +338,19 @@ public class GameEngine {
             case "StealSamples":
                 return (random.nextDouble() < 0.5) ? "StealSamples_Success" : "StealSamples_Caught";
 
+            case "ResearchHub":
+                // Update the ResearchHub node's story text with current stats
+                StoryNode researchNode = StoryData.getNode("ResearchHub");
+                if (researchNode != null) {
+                    String dynamicStory = "RESEARCH HUB VENTS - A maze of metal and whispered secrets\n" +
+                        "Goal: 12 Knowledge to expose the truth.\n\n" +
+                        "Purge Countdown: " + player.getPurgeCountdown() + " days remaining\n" +
+                        "Current Knowledge: " + player.getKnowledge() + "/12\n" +
+                        "Energy remaining: " + player.getEnergy() + "/5";
+                    researchNode.setStory(dynamicStory);
+                }
+                return "ResearchHub";
+
             case "FinalCheck":
                 return (player.getKnowledge() >= 12) ? "FinalCheck_Ready" : "FinalCheck_NotReady";
 
@@ -291,7 +364,7 @@ public class GameEngine {
             case "PurgeReveal":
                 player.setPurgeActive(true);
                 player.setPurgeCountdown(7);
-                return choiceNodeId; // Continue to next choice node
+                return "PurgeReveal"; // Continue to next choice node
 
             default:
                 return choiceNodeId; // No branching, return as-is
@@ -300,7 +373,7 @@ public class GameEngine {
 
     //MINGLE branching: Pick random unheard rumor or nothing
     private String branchMingle() {
-            if (player.getKnowledge() >= 4 || !player.hasUnheardRumors()) { // knowledge cap at 4
+            if (player.getKnowledge() >= 6 || !player.hasUnheardRumors()) { // knowledge cap at 6
             return "Mingle_Nothing";
         }
 
