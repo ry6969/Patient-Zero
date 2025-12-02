@@ -5,15 +5,22 @@
 ### 🐛 BUG FIXES
 
 ### 🔧 MODIFICATIONS
-- **TextRenderer.java**: Optimized the display of the following (*Patch 1*)
-  - *Knowledge*
-  - *Days in Haven*
-  - *Purge Countdown*
+
+- **TextRenderer.java**:
+  Optimized the display of the following (*Patch 1*):
+    - *Knowledge*
+    - *Days in Haven*
+    - *Purge Countdown*
+
 - **Player.java** (*patch 2*): 
   - Modified the changeHealth() to have a cap of 10 
 
-### ADDED
+- **DayEffect.java**:
+  - Optimized the logic handling of Purge Counter (*Patch 3*):
+
+### 🧩 ADDED
 - **StoryData.java**: 
+  - Added the noMoreRations Story Node (*Patch 4*)
 
 - **Player.java** (*patch 2*):
   - Added the variables and their respective setters, and getters: 
