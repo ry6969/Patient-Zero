@@ -191,7 +191,7 @@ The project follows a clean **three-layer architecture** separating concerns:
 │   │   └── Choice.java              # Player choices with condition list & inverted conditions
 │   ├── 📂 engine/
 │   │   ├── GameEngine.java          # Core game loop: 11 steps, 6 interrupts, 13 branching IDs
-│   │   └── StoryData.java           # 61 story nodes, 7 rumors, effect wiring
+│   │   └── StoryData.java           # 71 story nodes, 7 rumors, effect wiring
 │   ├── 📂 effect/
 │   │   ├── Effect.java              # Abstract class
 │   │   ├── HealthEffect.java        # -/+ health
@@ -209,8 +209,7 @@ The project follows a clean **three-layer architecture** separating concerns:
 │   └── 📂 ui/
 │       └── TextRenderer.java        # Formatted console display
 ├── 📄 README.md                     # This file
-├── 📄 CHANGELOG.md                  # Version history
-└── 📄 PROJECT_COMPLETION_SUMMARY.md # Detailed completion report
+└── 📄 CHANGELOG.md                  # Version history
 ```
 
 ### Main Classes and Their Roles
