@@ -4,7 +4,6 @@ import model.Player;
 
 //Effect that advances the player's day counter.
 public class DayEffect extends Effect {
-    // Removed private int amount
 
     public DayEffect(int amount) {
         super(amount);

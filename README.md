@@ -489,7 +489,7 @@ Enter Action Number:
 <th>Contributions</th>
 </tr>
 <tr>
-<td><strong>Bueno, Basty A.</strong></td>
+<td><strong>Bueno, Sebastian Miguel A.</strong></td>
 <td>Lead Developer</td>
 <td>Story writing, game engine architecture, effect system, branching logic, bug fixes</td>
 </tr>
@@ -600,8 +600,8 @@ The GameEngine follows an 11-step main loop:
 This project was created for educational purposes as part of an Object-Oriented Programming course. Students may use this as a reference for understanding OOP concepts, but should not copy it verbatim for their own assignments.
 
 **Version Information**
-- **Current Version**: 2.2
-- **Last Updated**: December 1, 2025
+- **Current Version**: 2.3
+- **Last Updated**: December 2, 2025
 - **Java Version**: Java 11+
 
 ---

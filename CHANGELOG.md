@@ -1,5 +1,26 @@
 # CHANGELOG
 
+## [v2.3] - 2025-12-01 (Fixed Bugs, Logical Errors and Optimized Gameplay Flow)
+
+### 🐛 BUG FIXES
+
+### 🔧 MODIFICATIONS
+- **TextRenderer.java**: Optimized the display of the following (*Patch 1*)
+  - *Knowledge*
+  - *Days in Haven*
+  - *Purge Countdown*
+- **Player.java** (*patch 2*): 
+  - Modified the changeHealth() to have a cap of 10 
+
+### ADDED
+- **StoryData.java**: 
+
+- **Player.java** (*patch 2*):
+  - Added the variables and their respective setters, and getters: 
+    - *dormSearches*
+    - *rationsShared*
+    - *clinicObservations*
+
 ## [v2.2] - 2025-12-01 (Critical Bug Fixes & Energy Condition System)
 
 ### 🐛 BUG FIXES
