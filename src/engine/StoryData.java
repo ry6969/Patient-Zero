@@ -400,6 +400,13 @@ public class StoryData {
         shareFoodStillGive.addChoice(new Choice("\"Back to the dorms.\"", null, "HavenIntro"));
         storyNodes.put(shareFoodStillGive.getId(), shareFoodStillGive);
 
+        StoryNode noMoreRations = new StoryNode("NoMoreRations",
+            "You look at your dwindling rations.\n\n" +
+            "\"I could only give so much,\" you think sadly. \"My own supplies are running low.\"\n\n" +
+            "You have to think about your own survival now.");
+        noMoreRations.addEffect(new MoraleEffect(-1));
+        noMoreRations.addChoice(new Choice("\"Better conserve what I have.\"", null, "HavenIntro"));
+
         StoryNode shareFoodStarve = new StoryNode("ShareFood_Starve",
             "You hold back the rations. Their grateful faces haunt you more than the hunger does.\n\n" +
             "Guilt eats at you physically.");
